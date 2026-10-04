@@ -1,0 +1,1707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Биокинетика — дашборд размещений</title>
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;
+--green:#16a34a;--green-bg:#dcfce7;--amber:#d97706;--amber-bg:#fef3c7;--red:#dc2626;--red-bg:#fee2e2;
+--blue:#2563eb;--blue-bg:#dbeafe;--violet:#7c3aed;--violet-bg:#ede9fe;--slate:#f1f5f9}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:1560px;margin:0 auto;padding:20px 24px 64px}
+h1{font-size:22px;margin:0 0 2px}
+h2{font-size:16px;margin:0 0 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+h2 .hint{font-weight:400;font-size:12px;color:var(--muted)}
+.sub{color:var(--muted);font-size:13px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.badge{display:inline-block;background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:3px 8px;font-size:11px;font-weight:600}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:14px}
+.upd{font-size:12px;color:var(--muted);text-align:right}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.f{background:#fff;border:1px solid var(--line);border-radius:8px;padding:5px 10px;min-width:168px}
+.f span{color:var(--muted);font-size:11px;display:block;line-height:1.2}
+.f select{border:0;background:transparent;font:600 13px inherit;color:var(--ink);padding:0;margin:0;cursor:pointer;width:100%;max-width:240px}
+.f select:focus{outline:none}
+.reset{border:1px solid var(--line);background:#fff;border-radius:8px;padding:9px 12px;font-size:12px;cursor:pointer;color:var(--muted)}
+.reset:hover{color:var(--ink)}
+.qm{display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;
+background:var(--slate);color:var(--muted);font-size:9px;font-weight:700;cursor:help;margin-left:4px;vertical-align:middle;
+text-transform:none;letter-spacing:0}
+.qm:hover{background:var(--blue);color:#fff}
+#tip{position:fixed;z-index:9999;max-width:340px;background:#0f172a;color:#fff;padding:10px 12px;
+border-radius:8px;font:400 12.5px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+box-shadow:0 8px 24px rgba(15,23,42,.28);pointer-events:none;opacity:0;transition:opacity .09s;
+text-transform:none;letter-spacing:0;text-align:left;white-space:normal}
+#tip.on{opacity:1}
+.kpis{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;margin-bottom:16px}
+.kpi{cursor:pointer;transition:border-color .12s,box-shadow .12s}
+.kpi:hover{border-color:#94a3b8}
+.kpi.act{border-color:var(--violet);box-shadow:0 0 0 2px #ede9fe}
+.kpich{padding:14px 18px 10px}
+.kpich h4{margin:0 0 2px;font-size:13px}
+.kpich p{margin:0 0 6px;font-size:12px;color:var(--muted)}
+.rt{display:flex;align-items:baseline;gap:6px;font-size:12px;color:var(--muted);margin-top:2px}
+.rt b{font-size:16px;color:var(--ink)}
+.rt i{font-style:normal;font-size:11px;letter-spacing:-1px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.kpi .val{font-size:21px;font-weight:650;letter-spacing:-.01em}
+.kpi .dlt{font-size:12px;margin-top:4px;color:var(--muted)}
+.pb{height:5px;border-radius:3px;background:var(--slate);margin-top:8px;overflow:hidden}
+.pb i{display:block;height:100%}
+h4.sh{margin:16px 0 8px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+h4.sh:first-of-type{margin-top:0}
+details.q{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:16px}
+details.q>summary{list-style:none;cursor:pointer;padding:14px 18px;font-weight:600;font-size:15px;display:flex;align-items:center;gap:8px}
+details.q>summary::-webkit-details-marker{display:none}
+details.q>summary::before{content:"▸";color:var(--muted);font-size:12px}
+details.q[open]>summary::before{content:"▾"}
+details.q>summary em{font-style:normal;font-weight:400;font-size:12px;color:var(--muted);margin-left:auto;text-align:right}
+.qbody{padding:0 18px 18px}
+.qbar{display:flex;height:30px;border-radius:8px;overflow:hidden;margin:6px 0 8px}
+.qbar div{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden}
+.alerts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.alert{display:flex;gap:10px;background:var(--slate);border-radius:8px;padding:10px 12px;font-size:13px}
+.alert.warn{background:var(--amber-bg)}.alert.bad{background:var(--red-bg)}
+.alert b{display:block}
+table.srct{width:100%;table-layout:fixed}
+table.srct th,table.srct td{text-align:left;white-space:normal;vertical-align:top;padding:10px 14px;font-size:13px;line-height:1.4}
+table.srct th{position:static;text-transform:none;font-size:11px;letter-spacing:.02em}
+table.srct th.d,table.srct td.d{width:210px;font-weight:600;color:var(--ink)}
+table.srct td{color:var(--muted)}
+table.srct td.w{color:var(--ink);background:#f8fbff}
+table.srct th.w{background:#f8fbff;color:var(--blue)}
+table.srct tr:hover td{background:#fafbfc}
+table.srct tr:hover td.w{background:#eff6ff}
+.src{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px}
+.src div{background:var(--slate);border-radius:8px;padding:10px 12px}
+.src b{display:block;margin-bottom:2px}
+.tblbox{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+table{border-collapse:separate;border-spacing:0;font-size:13px;width:max-content;min-width:100%}
+th,td{padding:8px 10px;text-align:right;white-space:nowrap;border-bottom:1px solid #f1f5f9}
+th{position:sticky;top:0;background:#fff;z-index:3;font-size:10.5px;font-weight:600;color:var(--muted);
+text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--line)}
+td.gs,th.gs{border-left:2px solid var(--line)}
+.c0{position:sticky;left:0;background:#fff;z-index:2;text-align:left;min-width:340px;box-shadow:1px 0 0 var(--line)}
+th.c0{z-index:4}
+.tblbox.sm .c0{min-width:250px}
+tr:hover td{background:#fafbfc}tr:hover .c0{background:#fafbfc}
+tr.lv0 td,tr.lv0>.c0{background:#f8fafc;font-weight:600}
+tr.lv0>.c0{font-weight:700}
+tr.lv0:hover td,tr.lv0:hover .c0{background:#f1f5f9}
+tr.lv1>.c0{font-weight:600;padding-left:26px}
+tr.lv1 td,tr.lv1>.c0{background:#fcfdfe}
+tr.lv2>.c0{padding-left:48px;font-weight:400}
+.tg{display:inline-block;width:14px;color:var(--muted);cursor:pointer;user-select:none;font-size:10px}
+.nm{display:inline-flex;flex-direction:column;gap:1px;vertical-align:middle;max-width:520px}
+.nm a{color:inherit;text-decoration:none;border-bottom:1px dotted #94a3b8}
+.nm a:hover{color:var(--blue)}
+.nm small{color:var(--muted);font-size:11px;font-weight:400;white-space:normal}
+tfoot td{font-weight:700;background:#f1f5f9;border-top:2px solid var(--line);border-bottom:none}
+tfoot td.c0{background:#f1f5f9}
+.tag{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;font-weight:600}
+.t-art{background:var(--green-bg);color:var(--green)}
+.t-promo{background:var(--violet-bg);color:var(--violet)}
+.t-utm{background:var(--blue-bg);color:var(--blue)}
+.t-none{background:var(--red-bg);color:var(--red)}
+.t-sys{background:var(--slate);color:var(--muted)}
+.pf{font-size:11px;color:var(--muted)}
+tr.info td,tr.info>.c0{opacity:.72}
+.bad{color:var(--red)}.good{color:var(--green)}.warn{color:var(--amber)}
+.kpi .val.good{color:var(--green)}.kpi .val.warn{color:var(--amber)}.kpi .val.bad{color:var(--red)}
+.cutbox{border:1px solid var(--line);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.cutbox>summary{list-style:none;cursor:pointer;padding:11px 14px;font-weight:600;font-size:13px;
+display:flex;align-items:center;gap:8px;background:#fbfcfd}
+.cutbox>summary::-webkit-details-marker{display:none}
+.cutbox>summary::before{content:"▸";color:var(--muted);font-size:11px}
+.cutbox[open]>summary::before{content:"▾"}
+.cutbox>summary em{font-style:normal;font-weight:400;font-size:12px;color:var(--muted);margin-left:auto}
+.cutbody{padding:14px}
+.chead{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.chead select{border:1px solid var(--line);border-radius:7px;padding:5px 9px;font:600 12px inherit;
+background:#fff;color:var(--ink);cursor:pointer}
+.mdd{position:relative;display:inline-block}
+.mbtn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 10px;
+font:600 12px inherit;color:var(--ink);cursor:pointer;white-space:nowrap;max-width:280px;overflow:hidden;text-overflow:ellipsis}
+.mbtn:hover{border-color:#94a3b8}
+.mpop{position:absolute;top:calc(100% + 4px);left:0;z-index:50;background:#fff;border:1px solid var(--line);
+border-radius:9px;box-shadow:0 8px 22px rgba(15,23,42,.13);padding:4px;min-width:170px;display:none}
+.mpop.on{display:block}
+.mpop div{padding:6px 9px;border-radius:6px;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:7px;color:var(--muted)}
+.mpop div:hover{background:var(--slate)}
+.mpop div.on{color:var(--ink);font-weight:600}
+.mpop div i{width:13px;height:13px;border:1.5px solid var(--line);border-radius:4px;display:inline-block;flex:none;position:relative}
+.mpop div.on i{background:var(--blue);border-color:var(--blue)}
+.mpop div.on i::after{content:"";position:absolute;left:3.5px;top:1px;width:3px;height:6px;
+border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(42deg)}
+.mpop div.dis{opacity:.4;cursor:not-allowed}
+.cyc{display:inline-flex;align-items:center;justify-content:center;width:28px;height:26px;
+border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;color:var(--muted);padding:0}
+.cyc:hover{color:var(--ink);border-color:#94a3b8}
+.cyc.act{color:#fff;background:#0f172a;border-color:#0f172a}
+.cyc svg{width:14px;height:14px;display:block}
+.leg{display:flex;gap:6px;flex-wrap:wrap}
+.lg{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--line);
+border-radius:20px;font-size:11.5px;cursor:pointer;user-select:none;background:#fff;white-space:nowrap}
+.lg i{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
+.lg.off{opacity:.35}
+.lg.tot{font-weight:650}
+.lg:hover{border-color:#94a3b8}
+svg.ch{width:100%;height:auto;display:block;margin-bottom:12px;overflow:visible}
+svg.ch .grid{stroke:#eef2f6;stroke-width:1}
+svg.ch .axl{fill:#94a3b8;font-size:11px}
+svg.ch circle{pointer-events:none}
+svg.ch .sl line{stroke:#94a3b8;stroke-width:1;stroke-dasharray:3 3;opacity:0}
+svg.ch .sl:hover line{opacity:1}
+svg.ch .sl{cursor:crosshair}
+.mbar{height:5px;border-radius:3px;background:var(--slate);overflow:hidden;margin-top:4px;width:150px}
+.mbar i{display:block;height:100%}
+.ctrl{display:flex;gap:8px;margin-bottom:10px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 11px;font-size:12px;cursor:pointer;color:var(--muted)}
+.btn:hover{color:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.mini{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px}
+.mini h3{margin:0 0 3px;font-size:14px}
+.mini p.sub{margin:0 0 12px;font-size:12px}
+.li{display:grid;grid-template-columns:1fr auto;gap:8px;padding:7px 0;border-bottom:1px dashed #eef2f6;font-size:13px}
+.li:last-child{border:none}
+.li .l{display:flex;flex-direction:column;min-width:0}
+.li .l span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li small{color:var(--muted);font-size:11px}
+.pbw{display:flex;align-items:center;gap:6px;margin-top:6px}
+.pbw .pb{flex:1;margin:0}
+.pbw em{font-style:normal;font-size:11px;color:var(--muted);font-weight:600;min-width:30px;text-align:right}
+.kcard{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.khead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.khead b{font-size:15px}
+.khead span{font-size:12px;color:var(--muted)}
+.krow{display:grid;grid-template-columns:1.1fr .9fr .9fr .8fr;gap:10px;align-items:stretch}
+.kbox{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--slate)}
+.kbox .kt{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
+.kbox .kv{font-size:17px;font-weight:650;margin-top:2px}
+.kbox .ks{font-size:11px;color:var(--muted);margin-top:2px;line-height:1.35}
+.kbox select{font:600 12px inherit;border:1px solid var(--line);border-radius:6px;padding:2px 4px;margin-top:3px;background:#fff;width:100%}
+.kpay{background:#f5f3ff;border-color:#ddd6fe}
+.kpay .kv{color:#6d28d9;font-size:20px}
+.klvl{display:inline-block;font-size:10px;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:5px;vertical-align:2px}
+.kerr{margin-top:8px;font-size:11px;color:var(--muted)}
+.kerr b{color:#dc2626}
+.kdet{margin-top:8px}
+.kdet summary{font-size:12px;color:var(--muted);cursor:pointer}
+@media(max-width:1100px){.krow{grid-template-columns:1fr 1fr}}
+.scn{background:#eef2ff;color:#4338ca;border-radius:4px;padding:0 4px;font-weight:600}
+.li .v{font-weight:650;text-align:right}
+.chart{display:flex;align-items:flex-end;gap:10px;height:132px;margin-top:4px}
+.col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;height:100%}
+.bars{display:flex;gap:3px;align-items:flex-end;width:100%;height:100%}
+.bar{flex:1;border-radius:3px 3px 0 0;min-height:1px}
+.bar.s{background:#cbd5e1}.bar.r{background:var(--green)}
+.col .lb{font-size:10.5px;color:var(--muted)}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+@media(max-width:1400px){.kpis{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1700px) and (min-width:1401px){.kpis{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.grid2,.alerts,.src{grid-template-columns:1fr}}
+.tabs{display:flex;gap:6px;margin:0 0 14px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:none;padding:9px 14px;font:600 13px inherit;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--ink);border-bottom-color:var(--blue)}
+.tabs .tst{font-size:10px;font-weight:700;background:var(--amber-bg);color:var(--amber);border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:1px}
+.at-ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.seg button{border:0;background:#fff;padding:8px 12px;font:600 12px inherit;color:var(--muted);cursor:pointer}
+.seg button.on{background:var(--blue);color:#fff}
+.seg button:disabled{opacity:.35;cursor:not-allowed}
+.at-ctl input[type=date]{border:0;font:13px inherit;padding:2px 0;background:none}
+.at-kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+.at-k{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.at-k small{display:block;color:var(--muted);font-size:11px}
+.at-k b{font-size:20px}
+.at-k i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+.at-leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin:4px 0 6px}
+.at-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.at-leg i.dot{border-radius:50%}
+svg.at{width:100%;height:auto;display:block}
+svg.at .grid{stroke:#eef2f6}
+svg.at .axl{fill:#94a3b8;font-size:11px}
+svg.at .pub{cursor:pointer}
+svg.at .pub:hover{stroke:#0f172a;stroke-width:2}
+svg.at .seg:hover{stroke:#0f172a;stroke-width:1.2}
+.at-tbl tbody tr:hover td{background:#f8fafc}
+.at-tbl th:hover{color:var(--ink)}
+.at-tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.at-tbl th{text-align:right;font-weight:600;color:var(--muted);font-size:11px;padding:7px 8px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;white-space:nowrap}
+.at-tbl th:nth-child(-n+4),.at-tbl td:nth-child(-n+4){text-align:left}
+.at-tbl td{padding:7px 8px;border-bottom:1px solid #f1f5f9;text-align:right;white-space:nowrap}
+.at-tbl td.nm{white-space:normal;max-width:280px}
+.at-tbl tr.hl td{background:#fffbeb}
+.at-tbl a{color:var(--ink);text-decoration:none;border-bottom:1px dotted #94a3b8}
+.at-wrap{max-height:620px;overflow:auto}
+.bdg{display:inline-block;font-size:10.5px;font-weight:650;border-radius:6px;padding:1px 6px}
+.bdg.bf{background:var(--green-bg);color:var(--green)}
+.bdg.bm{background:var(--amber-bg);color:var(--amber)}
+.bdg.bz{background:var(--slate);color:var(--muted)}
+.bdg.bsh{background:#ede9fe;color:#6d28d9;white-space:nowrap}
+.srcupd{margin-top:4px}
+.srcupd>summary{list-style:none;cursor:pointer;font-size:11.5px;color:var(--blue);text-align:right}
+.srcupd>summary::-webkit-details-marker{display:none}
+.srcupd>summary::after{content:' ▾'}
+.srcupd[open]>summary::after{content:' ▴'}
+.srcupd>div{margin-top:6px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:left;
+  box-shadow:0 6px 18px rgba(15,23,42,.08);min-width:320px;max-width:420px}
+.su{display:flex;gap:7px;align-items:flex-start;font-size:11.5px;line-height:1.35;padding:3px 0;border-bottom:1px solid #f1f5f9}
+.su:last-child{border:0}
+.su i{width:7px;height:7px;border-radius:50%;flex:0 0 7px;margin-top:5px}
+.su b{font-weight:650;color:var(--ink)}
+.su em{font-style:normal;color:var(--muted)}
+.su span{margin-left:auto;white-space:nowrap;font-weight:600;color:var(--ink);padding-left:8px}
+.at-note{font-size:12.5px;color:var(--muted);line-height:1.55}
+.at-note b{color:var(--ink)}
+@media(max-width:1100px){.at-kpis{grid-template-columns:repeat(2,1fr)}}
+
+</style>
+</head>
+<body>
+<div id="tip"></div>
+<div class="wrap">
+
+<div class="top">
+  <div>
+    <h1>Дашборд размещений — Биокинетика</h1>
+    <p class="sub" id="subtitle"></p>
+  </div>
+  <div class="upd"><span class="dot"></span>Обновлено <span id="upd-d"></span> · <span id="upd-p"></span>
+  <details class="srcupd" id="srcupd"><summary>статус источников</summary><div id="srcupd-b"></div></details></div>
+</div>
+<div class="tabs"><button data-t="main" class="on" onclick="showTab('main')">Дашборд</button><button data-t="attr" onclick="showTab('attr')">Атрибуция публикаций<span class="tst">тест</span></button></div>
+<div id="tab-main">
+
+<div class="filters">
+  <label class="f"><span>Месяц</span><select id="f-m"></select></label>
+  <label class="f"><span>Тип</span><select id="f-typ">
+    <option value="all">Товары и боты</option><option value="goods">Только товары</option><option value="bots">Только боты</option></select></label>
+  <label class="f"><span>Продукт</span><select id="f-prod"></select></label>
+  <label class="f"><span>Активность</span><select id="f-act"></select></label>
+  <label class="f"><span>Площадка</span><select id="f-plat"></select></label>
+  <label class="f"><span>Канал</span><select id="f-chan"></select></label>
+  <label class="f"><span>Менеджер</span><select id="f-mgr"></select></label>
+  <label class="f"><span>Органика</span><select id="f-org">
+    <option value="on">показывать</option><option value="off">скрыть</option></select></label>
+  <label class="f"><span>Самовыкупы</span><select id="f-sb">
+    <option value="off">не учитывать</option><option value="on">учитывать в заказах</option></select></label>
+  <button class="reset" onclick="resetF()">Сбросить</button>
+</div>
+
+<div class="kpis" id="kpis"></div>
+<div class="card kpich"><div id="kpichart"></div></div>
+
+<div class="card">
+  <h2>План месяца <span class="hint">из общего медиаплана · показывается всегда, даже если факта ещё нет</span><span id="plan-qm"></span></h2>
+  <div id="plwarn"></div>
+  <details class="cutbox"><summary>По продуктам <em id="em-pp"></em></summary>
+    <div class="cutbody"><div id="pch-prod"></div><div class="tblbox sm"><table id="pl-prod"></table></div></div></details>
+  <details class="cutbox"><summary>По активностям <em id="em-pa"></em></summary>
+    <div class="cutbody"><div id="pch-act"></div><div class="tblbox sm"><table id="pl-act"></table></div></div></details>
+  <p class="sub" id="plnote" style="margin-top:10px"></p>
+</div>
+
+<div class="grid2">
+  <div class="mini"><h3><span id="best-h">Лучшие по CPO</span><span id="best-qm"></span></h3><p class="sub" id="best-sub">все размещения дешевле 400 ₽</p><div id="best"></div></div>
+  <div class="mini"><h3 id="worst-h">Слив бюджета</h3><p class="sub" id="worst-sub">топ-20 по ДРР, ссылки на публикации</p><div id="worst"></div></div>
+
+</div>
+
+<details class="q" id="qbox">
+  <summary>Качество атрибуции и расхождения в таблицах <em id="q-sum"></em></summary>
+  <div class="qbody">
+    <div class="qbar" id="qbar"></div>
+    <p class="sub">Доли считаются по потраченному бюджету. UTM-ссылка на карточку Wildberries меткой не считается — WB её не видит: там работает только уникальный поисковый артикул (WW…) или промокод. На Ozon работает ссылка с utm_campaign=vendor_org. Мобзио даёт клики, но заказы не привязывает.</p>
+    <div class="alerts" id="alerts"></div>
+  </div>
+</details>
+
+<details class="q" id="gapbox">
+  <summary>Каких данных не хватает <em>что доберём, когда подключим API</em></summary>
+  <div class="qbody">
+    <p class="sub" style="margin-bottom:12px">Список того, что сейчас либо считается вручную, либо не считается вовсе. Красное — блокирует расчёт, оранжевое — искажает, серое — мелочи и ручная работа.</p>
+    <div class="alerts">
+      <div class="alert bad"><span>🔴</span><div><b>Ozon Seller API — ключа нет</b>Не хватает: заказы, выкупы и выручка по SKU и датам, расход и статистика внутренней рекламы, органика, общее число заказов для контрольной суммы. Сейчас всё это берётся из таблиц Марии и Елены и из отчёта Анастасии.</div></div>
+      <div class="alert bad"><span>🔴</span><div><b>WB: отчёт по поисковым запросам</b>Без него подменные артикулы (WW…) не привязываются к заказам автоматически. Метод в API есть, но раздел требует подписки Джем — надо проверить, оплачена ли она. Ограничения: топ-30 запросов на товар и максимум 7 суток за один запрос, то есть тянуть надо еженедельно.</div></div>
+      <div class="alert warn"><span>🟠</span><div><b>Сайт: выгрузка Тильды руками</b>Заказы, выкупы и привязка к меткам уже считаются из CSV корзины. Но файл выгружается вручную, поэтому цифры по сайту свежие только на дату последней выгрузки.</div></div>
+      <div class="alert warn"><span>🟠</span><div><b>Отчёты Ани (июнь–июль): нет выкупов и выручки</b>Есть только заказы и «сумма заказов» до выкупа. ДРР по июню и июлю не считается. Добирается из API WB по датам и артикулу 1024637244.</div></div>
+      <div class="alert warn"><span>🟠</span><div><b>WB: воронка по карточкам</b>Переходы в карточку и добавления в корзину есть только там, где менеджер вёл их вручную. Метод nm-report в API это закрывает — тогда появятся клики и корзины по всем размещениям, а не по части.</div></div>
+      <div class="alert warn"><span>🟠</span><div><b>Внутренняя реклама WB и Ozon</b>Расход, заказы и суммы приходят из API площадок. Осталось добрать дневную детализацию по Ozon — сейчас его расход раскладывается по неделям ровно.</div></div>
+      <div class="alert warn"><span>🟠</span><div><b>Финансовый отчёт WB</b>Нет комиссий, логистики и возвратов, поэтому ДРР считается от валовой выручки, а не от денег, которые реально пришли. Метод reportDetailByPeriod.</div></div>
+      <div class="alert warn"><span>🟠</span><div><b>Остатки на складах</b>Не видно, был ли товар в наличии в день выхода публикации. Без этого нельзя отличить «блогер не сработал» от «товара не было».</div></div>
+      <div class="alert"><span>⚪</span><div><b>План по WB и Ozon раздельно</b>В медиаплане Елены они заданы одной строкой «Маркетплейс». План-факт по площадкам не считается — нужно, чтобы разделила.</div></div>
+      <div class="alert"><span>⚪</span><div><b>Плана на июнь нет</b>Медиаплан начинается с июля, поэтому июнь показывает только факт.</div></div>
+      <div class="alert"><span>⚪</span><div><b>AMINOTRIGGERFISH Прикормка — только план</b>Новый продукт, карточек на Ozon, WB и Авито ещё нет. План с октября есть, факт будет нулевым до запуска. При фильтре «Все продукты» это занижает процент выполнения бюджета.</div></div>
+      <div class="alert"><span>⚪</span><div><b>У Марии нет колонки «Продукт»</b>Все её строки считаются как AMINOTRIGGERFISH Сигнал. Пока это верно, но при добавлении продуктов сломается.</div></div>
+      <div class="alert"><span>⚪</span><div><b>Клики только по Мобзио</b>Там, где редирект не ставили, кликов нет вообще. Из API маркетплейсов клики по конкретному блогеру не приходят — только переходы в карточку целиком.</div></div>
+      <div class="alert"><span>⚪</span><div><b>Самовыкупы</b>WB и Ozon их не помечают, проставляются вручную Анастасией. Так и останется.</div></div>
+    </div>
+  </div>
+</details>
+
+<details class="q" id="ozbox">
+  <summary>Внешний трафик Ozon по меткам <em>из API Ozon · факт, а не оценка</em></summary>
+  <div class="qbody">
+    <p class="sub" id="oznote" style="margin-bottom:12px"></p>
+    <div class="tblbox"><table class="srct" id="oztbl"></table></div>
+  </div>
+</details>
+
+<details class="q" id="srcbox">
+  <summary>Откуда берутся данные <em>сейчас и как должно быть</em></summary>
+  <div class="qbody">
+    <p class="sub" style="margin-bottom:12px">Сейчас почти всё считается из таблиц менеджеров, потому что ключа Ozon API ещё нет, а коннектор Wildberries отдаёт только сводки. Правый столбец — целевая схема: цифры продаж тянем из API площадок, а из таблиц берём только то, чего в API нет физически — метки, расход и клики.</p>
+    <div class="tblbox"><table class="srct"><thead><tr>
+      <th class="d">Данные</th><th>Откуда берутся сейчас</th><th class="w">Откуда должны браться</th>
+    </tr></thead><tbody><tr><td class="d">Заказы — итог площадки</td><td><b>Из API обеих площадок за весь период.</b> Wildberries — воронка продаж, июнь–сентябрь. Ozon — заказы, август–сентябрь (раньше площадки не было: внешнего трафика до августа Ozon не фиксирует вообще)</td><td class="w">Автообновление раз в сутки вместо ручного запуска</td></tr>
+<tr><td class="d">Средний чек</td><td>Считается дашбордом: сумма заказов ÷ количество заказов. Вручную нигде не вбивается. База — цена до скидки площадки, поэтому чек выше того, что покупатель платит на кассе. По ботам не считается</td><td class="w">Разделить два SKU на Ozon (одиночная банка и комплект 2 шт) — сейчас они в одном продукте, и чек смешанный: в августе одиночная 947 ₽, комплект 1 776 ₽</td></tr>
+<tr><td class="d">Сумма заказов: с СПП или без</td><td><b>Берём БЕЗ СПП — цену до скидки площадки.</b> Это расчётная база, от которой Ozon и WB считают свои комиссии и хранение. За август по Ozon это 932 630 ₽ (чек 1 001 ₽), а не 519 216 ₽ из выгрузки по цене реализации (чек 532 ₽) — разница и есть скидка площадки за её счёт. Отчёт Ozon по внешнему трафику отдаёт суммы в той же базе, без учёта акций, поэтому блогерские суммы и итог площадки сопоставимы</td><td class="w">Так и оставляем</td></tr>
+<tr><td class="d">Заказы — по размещениям Ozon</td><td><b>Факт из API по метке</b> — строка помечена плашкой «факт API». Метка ищется в трёх разрезах отчёта Ozon: campaign, content и term, потому что менеджеры кладут её по-разному. Короткие ссылки ozon.onelink.me раскрываются до полной, длинные читаются по параметру c=. Метка ищется по всему телу ссылки, а не только по хвосту — менеджеры размечают по-разному. Все 35 Ozon-размещений за август и сентябрь связаны с фактом</td><td class="w">Правило для менеджеров: у каждой интеграции своя метка, различимая хотя бы в одном из полей campaign, content, term. При проверке сверять всё тело метки целиком</td></tr>
+<tr><td class="d">Заказы — по каналам и блогерам WB и сайта</td><td>Оценка из таблиц менеджеров, проставляется вручную</td><td class="w">По WB — воронка по nmId подменного артикула. По сайту — выгрузка заказов Тильды с UTM</td></tr><tr><td class="d">Выкупы</td><td><b>Wildberries — API</b>, воронка продаж. <b>Ozon — API заказов</b>, статус «доставлен» по заказам выбранного месяца (когортно). За август 829 из 921 отправлений. Раньше бралось из выгрузки кабинета — там было 894, расхождение из-за другого способа счёта</td><td class="w">Ozon: учитываются обе схемы — FBS (со своего склада) и FBO (со склада Ozon). Выкуп = отправление в статусе «доставлен»</td></tr><tr><td class="d">Процент выкупа</td><td>Отдельной плитки нет — убрана. Правило на будущее: считать <b>когортно</b>, то есть взять заказы месяца и посмотреть их финальную судьбу. Wildberries отдаёт такой процент в воронке продаж, по Ozon он собирается из отчёта по заказам: доставленные отправления ÷ все отправления месяца. Август — 829 из 921, то есть 90%, совпадает с кабинетом. Аналитику воронки Ozon (<code>ozon_analytics</code>) использовать нельзя: там выкупы по дате доставки, а заказы по дате заказа, и процент выходит вдвое ниже реального</td><td class="w">На незакрытом месяце цифра не готова: заказы первых чисел доставлены на 85%, последних — на 10%. Считать в начале следующего месяца</td></tr><tr><td class="d">План суммы заказов</td><td>Отдельной строки под сумму заказов в медиаплане нет. Берём строку <b>«Выручка план, ₽»</b> — она считается как заказы × средний чек × % выкупа, то есть по смыслу это плановая сумма до выкупа. Один и тот же план стоит и на плитке «Сумма заказов», и на плитке «Выручка»</td><td class="w">Завести в медиаплане отдельные строки: план суммы заказов (до выкупа) и план выручки (после выкупа). Тогда две плитки перестанут делить одну цифру</td></tr><tr><td class="d">Выручка</td><td><b>Wildberries — API: сумма выкупленных товаров</b>, а не «к выплате». Средний чек выкупа считается как сумма выкупов ÷ количество выкупов. Ozon — выкупы × чек из выгрузки. Авито — сумма выкупленных заказов (delivered + closed). Комиссии площадок нигде не вычитаются</td><td class="w">Ozon тоже на API, по той же логике — сумма выкупленного, не к выплате</td></tr><tr><td class="d">Расход на размещение</td><td>Колонка «Итого к оплате» у менеджеров</td><td class="w">Остаётся из таблиц — в API этого нет и не будет</td></tr><tr><td class="d">Метки: артикул, промокод, UTM</td><td>Таблицы менеджеров по инфлюенсу. Подменный артикул WB берётся из колонки «Подменный артикул», а если она пустая — из поисковой ссылки WB (<code>search=WW…</code>) в колонке «Ссылка с UTM». <b>Заказы по подменным артикулам WB</b> — только из таблицы менеджера: в API Wildberries этих данных нет вообще, они есть лишь в кабинете («Рост продаж → Подменные артикулы»). <b>Заказы по UTM Ozon</b> — из API Ozon «Внешний трафик» (коннектор ozon_utm: разрезы campaign, content, term; заказы в окне атрибуции), обновляется при каждом обновлении данных по API. Сентябрь — отчёт Ozon от 21.09, август — выгрузка кабинета от 17.09. <b>Как сопоставляем:</b> короткие ссылки onelink.me раскрываются полностью (все 42 раскрыты на 21.09); метка ищется по всей ссылке. Если у метки одна кампания на одно размещение — сопоставляем по кампании. Если одна кампания стоит на нескольких размещениях — различаем по хвосту ссылки: utm_content, затем utm_term, затем utm_source. Заказы кампании, которые не разошлись по хвостам, делятся поровну между её публикациями без своего совпадения (например, 2 заказа vendor_org_4202727_max_m1 из 14 — публикации «Охота / Рыбалка / Отдых»). Если заказ по метке пришёл в месяце, где публикации с этой меткой нет, он засчитывается публикации прошлого месяца отдельной строкой «заказы по метке публикации от …» — в тот месяц, когда случился заказ, без расхода. На сентябрь по меткам сопоставлено 245 из 249 заказов (4 заказа — метка собственного бота, не публикация). Разрез source/medium в API общий на все кампании, поэтому для сопоставления не используется</td><td class="w">Заказы по UTM по дням — чтобы раскладывать факт на вкладке атрибуции без допущения 60/30/10. По WB — менеджер вносит заказы из отчёта по подменным артикулам</td></tr><tr><td class="d">Клики</td><td>Внутренняя реклама WB и Ozon — клики по рекламе из API. Посевы — клики Мобзио из таблиц менеджеров. Авито — просмотры карточки объявления из API Авито</td><td class="w">Переходы в карточку из воронок площадок — вместе с воронками</td></tr><tr><td class="d">Добавления в корзину</td><td>Решено пока не тянуть. В API есть: WB август 2 664 корзины, Ozon по меткам 795</td><td class="w">Вернуться позже</td></tr><tr><td class="d">Внутренняя реклама: расход, заказы, сумма</td><td><b>Целиком из API площадок — Wildberries и Ozon.</b> Таблица Анастасии для внутренней рекламы больше не используется. Недельная раскладка: по дневному расходу из API там, где он есть (сентябрь WB; за 18–21.09 API отдал только итог, поэтому этот остаток разложен поровну по дням); по сохранённому профилю прошлых месяцев для июня–августа; иначе ровно по прошедшим дням. Разбивка по продуктам берётся из названий кампаний — где её нет, весь расход относится к активатору</td><td class="w">Разбивка по дням прямо из API, без ручной сетки. CPO и ДРР считаются в дашборде сами</td></tr><tr><td class="d">Органика</td><td>Остаток: всего заказов минус реклама, посевы и самовыкупы</td><td class="w">Тот же остаток, но от точного числа заказов из API, а не из ручного отчёта</td></tr><tr><td class="d">Всего заказов площадки</td><td><b>Целиком из API.</b> Wildberries — воронка продаж по SKU. Ozon — отчёт по заказам, запрашивается двумя кусками по половине месяца, потому что отчёт режет выдачу на 1000 отправлений. Считаем <b>штуки заказанного товара по дате заказа</b>. На 21.09.2026: Ozon 1 485 шт аминотриггера (1 343 банки + 142 комплекта, обе схемы FBS и FBO, отменено 94), WB 797 заказов (789 аминотриггер + 8 аппликатор), сайт 4. До 21.09 коннектор Ozon не видел заказы со склада Ozon (FBO), и цифра была занижена: август 964 вместо 975, сентябрь 1 379 вместо 1 485. Сейчас совпадает с «Заказано товаров» в аналитике кабинета. По WB разница с кабинетом в несколько заказов — время суток</td><td class="w">Обновление раз в сутки автоматически, без ручного запуска</td></tr><tr><td class="d">Отмены заказов</td><td>Решено пока не учитывать. Справочно из API: WB за август 81 отмена на 73 225 ₽ по активатору, Ozon 64 из 932 отправлений (6%)</td><td class="w">Вернуться к этому позже — данные в API есть, включается одним переключателем</td></tr><tr><td class="d">Самовыкупы</td><td>WB и Ozon — отчёт Анастасии, <b>единственное, что берём из её таблицы</b>. Авито — число называет Виталий, вычитается из заказов и выкупов Авито</td><td class="w">Останется вручную: площадки самовыкупы никак не помечают</td></tr><tr><td class="d">Заказы с сайта</td><td><b>Выгрузка заказов из Тильды (CSV корзины).</b> В заказы идёт всё, кроме тестовых и дублей — и оплаченные, и с ошибкой оплаты. <b>Тестовым</b> считается заказ с почтой test@test.ru, test@gmail.com или vetal.wellness@gmail.com, либо с телефоном +7 (999) 999-99-99. <b>Дубль</b> — тот же человек (телефон или почта) с той же суммой в пределах двух часов; из группы остаётся оплаченный заказ, потому что первая попытка часто срывается на оплате. Заказ со статусом «оплачен» (в выгрузке заполнен paymentid) идёт ещё и в <b>выкупы</b> и в выручку. Метка utm_campaign из referer сопоставляется с размещением менеджера — тогда заказ и выкуп привязываются к конкретной публикации. Метки без размещения и заказы без метки идут отдельными строками. Заказы сайта суммируются в общий итог по заказам вместе с WB и Ozon</td><td class="w">Второй сайт — в том же формате. Дальше — вебхук формы, чтобы выгружать не руками, и сверка статусов оплаты прямо из CRM</td></tr><tr><td class="d">Рейтинг карточек</td><td><b>Из API площадок.</b> WB — рейтинг карточки по SKU из воронки продаж, Ozon — оценка товаров продавца (<code>ozon_rating</code>), Авито — рейтинг продавца (карточки Авито отдельно не оценивает). Истории API не отдаёт, поэтому при каждом обновлении в <code>rating.json</code> сохраняется снимок с датой, и каждый встаёт точкой на свою неделю. 22.09.2026: WB 4,7 (аппликатор 4,9), Ozon 4,8, Авито 5,0. Ранние недели WB и Ozon — из отчёта Анастасии</td><td class="w">Так и работает, динамика копится сама</td></tr>
+<tr><td class="d">Контент-рейтинг карточек Ozon</td><td>Есть в API, пока не выведен в дашборд. На 08.09: активатор 250 мл — 87,5 из 100 (не хватает аннотации 100–500 знаков и Rich-контента), комплект 2 шт — 69,5 (нет видео, мало изображений, та же аннотация)</td><td class="w">Вывести отдельной строкой рядом с рейтингом по отзывам — это разные вещи: одна про качество заполнения карточки, вторая про оценки покупателей</td></tr>
+<tr><td class="d">Сценарий рекламы</td><td>Колонка «Сценарий рекламы» в таблицах менеджеров. Заполняет только Мария (номер сценария или название, например «Бабушки»), у Елены колонка пустая</td><td class="w">Обязательное поле у всех менеджеров с единым справочником сценариев, чтобы сравнивать CPO между сценариями, а не только между блогерами</td></tr>
+<tr><td class="d">«Лучшие» и «Слив бюджета» — как считаются</td><td>Одна строка = одна публикация из таблицы менеджера за выбранный период, никакой группировки по блогеру. «Лучшие» — CPO = «Итого к оплате» ÷ «Заказы» той же строки, порог 400 ₽, сортировка по возрастанию. «Слив бюджета» — те же строки, топ-20 по самому дорогому CPO, включая размещения с нулём заказов. В фильтре продукта-бота оба блока переключаются на регистрации и CPA, порог 250 ₽</td><td class="w">Заказы и регистрации по каждой публикации из API площадки и из бота по её метке — тогда оба рейтинга перестанут зависеть от того, как менеджер оценил результат</td></tr>
+<tr><td class="d">Активность — четвёртое измерение</td><td>Из медиаплана: инфлюенс-посев, внутренняя реклама, Авито, SEO-продвижение, конкурс репостов в ВК, свой YouTube-канал, Телеграм ADS, плюс служебные — органика и самовыкупы. Активность отвечает на вопрос «какая механика», площадка — «где произошёл заказ», канал — «откуда пришёл трафик»</td><td class="w">Менеджеры проставляют активность в своих таблицах. Пока проставляется автоматически: всё из таблиц инфлюенса — посев, API площадок — внутренняя реклама, отчёт Анастасии — самовыкупы</td></tr>
+<tr><td class="d">Вкладка «Атрибуция публикаций» (тест)</td><td>Заказы по дням: Ozon — отчёт по заказам (отправления FBS+FBO), WB — выгрузка воронки по дням до 07.09 и API с 08.09. Реклама по дням: Ozon — API рекламы; WB — месячные заказы кампаний, разложенные по дневному расходу. UTM-факт — API Ozon «Внешний трафик» (отчёт от 21.09), сопоставленная с публикациями по всей метке, как в основном дашборде (campaign → content → term → source/medium), и разложенная от даты выхода 60/30/10%. <b>У публикации с UTM-меткой на Ozon — только факт из отчёта</b>: не нашли метку или по ней 0 заказов — факт 0, модель к ней не применяется. Если одна метка стоит на нескольких публикациях без различающего хвоста, заказы по ней делятся между ними поровну (колонка «Общая метка»); у кампании с хвостами остаток заказов, не разошедшийся по хвостам, отдаём её публикациям без совпадения. Колонка «По таблице» — цифра менеджера, только для сравнения. Публикации, охват и расход — таблицы Елены, Марии и Ани. Остаток над органическим фоном делится только между публикациями <b>без UTM-метки</b> (промокод, без метки, подменный артикул WB), вышедшими в этот день и за 1–2 дня до него, пропорционально охвату × конверсии канала; потолок 1% охвата. Цифры модели — оценка, в основные плитки и таблицы дашборда не попадают</td><td class="w">Обновлять дневные ряды автоматически; когда починятся заказы по UTM в API Ozon — брать UTM-факт по дням напрямую, без раскладки 60/30/10</td></tr><tr><td class="d">Боты как источник продаж</td><td>Заказы товара, пришедшие из ботов по UTM-меткам. Ozon — отчёт «Внешний трафик», хвосты utm_content <b>klevaya_karta</b> и <b>Kiev_karta</b> (бот «Клевая карта»). Сайт — выгрузка Тильды, utm_source <b>klev_m_bot</b> («Клевая карта») и <b>greendoc_bot</b> («Зелёный доктор»). Строка товара: площадка — где купили, канал «Бот …», активность «Бот → продажи», расход 0 — бюджет бота уже учтён в строках самого бота. Заказы вынимаются из органики, поэтому общий итог не меняется. В срезе «Только боты» — справочная строка «боты привели заказов» в блоке плана, с регистрациями не складывается. Сентябрь: 4 заказа на Ozon на 5 382 ₽; на сайте единственный заказ с меткой бота — тестовый</td><td class="w">«Зелёный доктор» → WB по подменному артикулу WW971520: в API WB нет, только отчёт кабинета. Сайт kormi-korni.ru (аппликатор) — выгрузки заказов пока нет</td></tr><tr><td class="d">Авито</td><td><b>API Авито</b> (коннектор avito-biokinetika) с 22.09.2026. Все объявления одного товара (их сотни — по городам) складываются в одну строку; продукт определяется по названию объявления: «аппликатор» / «Ермаков» → аппликатор, остальное → аминотриггер. <b>Заказы</b> — все заказы Авито Доставки вместе с отменёнными (сентябрь 1–22: 30, отменено 8, в пути 5). <b>Сумма заказов</b> — реальная цена в заказах (21 809 ₽). <b>Выкуп</b> — статусы delivered (покупатель получил, идёт срок проверки) и closed (сделка завершена, деньги у продавца): 17 на 10 813 ₽. <b>Выручка</b> — сумма выкупленных, без вычета комиссии Авито, как у WB и Ozon. <b>Расход</b> — «расход всего» из статистики по дням (37 767 ₽; метод «расходы» отдаёт пустые строки). <b>Клики</b> — просмотры карточки (19 262). <b>Контакты</b> — сообщения + звонки (166 + 1), отдельная плитка. <b>Самовыкупы</b> — число от Виталия, вычитается из заказов и выкупов (сентябрь: 3, отнесены на 1-ю неделю — 3 заказа по 100 ₽ от 01.09). <b>Рейтинг</b> — рейтинг продавца (5,0 по 4 отзывам)</td><td class="w">Разбивку по объявлениям и воронку Авито (показы → просмотры → контакты → заказы) — вместе с воронками WB и Ozon</td></tr><tr><td class="d">Плановые активности без факта</td><td>Авито с сентября имеет факт (см. строку «Авито»). SEO, конкурс репостов в ВК и свой YouTube-канал видны в блоке «План месяца» и в фильтре активностей: у них есть бюджет, но площадка назначения пока неизвестна</td><td class="w">Отчёт по Авито (заказы и расход), Метрика и Search Console по SEO, отчёт по конкурсу и статистика своего YouTube-канала. Как появятся — привяжутся к своей площадке</td></tr>
+<tr><td class="d">Пороги CPO по продуктам</td><td>Разный средний чек — разные пороги. AMINOTRIGGERFISH (Сигнал и Прикормка): зелёный до 200 ₽, жёлтый 200–400 ₽, красный выше 400 ₽. Аппликатор Ермакова: зелёный до 800 ₽, жёлтый 801–2000 ₽, красный выше 2000 ₽. Боты — CPA: зелёный до 130 ₽, жёлтый 130–250 ₽, красный выше. При фильтре «Все продукты» в таблицах действуют пороги AMINOTRIGGERFISH, а в блоках «Лучшие» и «Слив бюджета» каждая строка красится по своему продукту</td><td class="w">Пороги задаются вручную. Правильнее считать их от юнит-экономики: целевой CPO = маржа × допустимая доля рекламы, по каждому продукту отдельно</td></tr>
+<tr><td class="d">Заказы и регистрации</td><td>Две независимые метрики, никогда не складываются. Заказы и CPO — у товаров, регистрации и CPA — у ботов. Сквозные метрики, которые суммируются по всему: бюджет, размещения, клики</td><td class="w">Когда бот начнёт приводить продажи, заказы из бота встанут в товарный контур с активностью «бот» и своей площадкой (WB, Ozon или сайт)</td></tr>
+<tr><td class="d">Органика в плане</td><td>Медиаплан построен от бюджета: заказы = бюджет ÷ целевой CPO. У органики бюджета нет, поэтому строки в плане нет, а плановое «Итого заказов» — это только платные каналы. В блоке «План месяца» факт считается по тем же данным, что и плитки: органика входит в факт продукта и в итог, в разрезе активностей — отдельной строкой без плана. Поэтому итоги блока и плиток совпадают</td><td class="w">Так и оставить: органика — это результат, а не статья бюджета. Её можно скрыть фильтром «Органика» — тогда она уйдёт и из плиток, и из блока плана</td></tr>
+<tr><td class="d">Площадка продаж, когда колонка пустая</td><td>Если «Канал продаж» у менеджера не заполнен, площадка определяется по метке: артикул на WW — Wildberries, ссылка с ozon — Ozon, ссылка на trigger-fish — сайт. «Не указано» остаётся, только если нет ни одной зацепки</td><td class="w">Обязательное поле «Канал продаж» у всех менеджеров</td></tr>
+<tr><td class="d">План — весь</td><td>Только общий медиаплан «Медиаплан_Маркетинг», лист «План упрощённый»: бюджет, заказы, выручка, продукты и каналы. <b>Из этого файла берётся только план — колонки «факт» после каждого месяца не читаются вообще</b> (факт там вносится вручную и может расходиться с площадками). Плановый бюджет месяца — это сумма строк «Итого бюджет» по продуктам выбранного среза, она совпадает со строкой «ИТОГО БЮДЖЕТ» в своде; строку «Плановый бюджет» из блока контроля дашборд не использует — это годовая прикидка. С 01.10.2026 в файле два аминотриггера: «Сигнал» (то, что продаётся) и «Прикормка» (сухая, ещё не запущена — есть план, факта нет). Медиапланы в таблицах менеджеров как источник плана не используются — они не сходятся с общим (август: 34 034 заказа против 13 205 в сумме у менеджеров)</td><td class="w">Тот же файл, но с разбивкой плана по менеджерам на каждый месяц — сейчас такой блок есть только под один выбранный месяц</td></tr>
+<tr><td class="d">Регистрации в боте</td><td>«Зелёный доктор» — колонка «Запустили бота» в отчёте Ани (июнь–июль). «Умный сад» — колонка «Кол-во регистраций» в файле закупки Татьяны (март–май), привязка по метке startapp=src_*</td><td class="w">Выгрузка из самого бота по метке источника, с датой регистрации — тогда регистрации встанут по неделям точно, а не по дате выхода публикации</td></tr>
+<tr><td class="d">Продукт размещения</td><td>Колонка «Продукт» в таблицах менеджеров. Пустая ячейка = AMINOTRIGGERFISH Сигнал. Слово «прикормка» в ячейке = AMINOTRIGGERFISH Прикормка. Продукт определяет, что считать результатом: заказы для товаров, регистрации для ботов</td><td class="w">Обязательное поле у всех менеджеров со справочником: AMINOTRIGGERFISH Сигнал, AMINOTRIGGERFISH Прикормка, Аппликатор, Бот «Зелёный доктор», Бот «Умный сад», Бот «Клёвая карта»</td></tr>
+<tr><td class="d">Фильтры: когда сбрасываются</td><td>Фильтр откатывается на «все», если выбранное значение не встречается в текущем срезе — иначе экран был бы пустым. Например, выбрана площадка «Авито», а потом активность «Инфлюенс-посев»: посева на Авито нет, площадка сбросится. <b>Исключение — продукт и активность, у которых есть план:</b> они остаются выбранными даже без факта, чтобы можно было смотреть план по ещё не запущенному продукту. Так работает AMINOTRIGGERFISH Прикормка: в октябре у неё есть план и нет факта, и фильтр её держит; в сентябре плана нет, поэтому её нет и в списке</td><td class="w">Так и оставить: сброс защищает от пустого экрана, а план-без-факта виден там, где он задан</td></tr><tr><td class="d">Статус источников</td><td>Рядом с датой обновления показано, сколько процентов выбранного месяца прошло — это ориентир к проценту выполнения плана: если прошло 80% месяца, а план выполнен на 60%, темп отстаёт. Для прошлых месяцев всегда 100%. В шапке под датой обновления — раскрывающийся список: когда последний раз обновлялся каждый источник. Дата берётся из времени файла с данными, поэтому её нельзя забыть проставить. Цвет: зелёный — свежее, жёлтый — пора обновить, красный — устарело. Для API нормой считаются сутки, для таблиц менеджеров и выгрузки Тильды — трое суток, для медиаплана — месяц</td><td class="w">Автообновление раз в сутки — тогда у API всегда будет зелёный</td></tr><tr><td class="d">План</td><td>«Медиаплан_Маркетинг» — общие цифры, медиапланы менеджеров — по каналам. План бюджета, заказов и регистраций задан по каждому продукту и боту отдельно и суммируется по фильтру: «Товары и боты» — всё, «Только товары» — оба аминотриггера + аппликатор, «Только боты» — все боты, конкретный продукт — только он</td><td class="w">То же самое, но с разделением плана на Wildberries и Ozon отдельно</td></tr></tbody></table></div>
+  </div>
+</details>
+
+
+<details class="q" id="detbox">
+  <summary>Детализация: разрез месяца и план-факт по площадкам → каналам → интеграциям <em>свёрнуто, раскрыть по клику</em></summary>
+  <div class="qbody">
+<div class="card">
+  <h2><span id="cut-h">Разрез месяца</span> <span class="hint">график и таблица · блоки сворачиваются</span></h2>
+  <details class="cutbox"><summary>По площадкам <em id="em-plat"></em></summary>
+    <div class="cutbody"><div id="ch-plat"></div><div class="tblbox sm"><table id="sp-plat"></table></div></div></details>
+  <details class="cutbox"><summary>По каналам <em id="em-chan"></em></summary>
+    <div class="cutbody"><div id="ch-chan"></div><div class="tblbox sm"><table id="sp-chan"></table></div></div></details>
+  <details class="cutbox"><summary>По продуктам <em id="em-prod"></em><span class="qm" data-t="Этот блок всегда показывает все продукты, независимо от фильтра «Продукт» в шапке — иначе он вырождался бы в одну строку.">?</span></summary>
+    <div class="cutbody"><div id="ch-prod"></div><div class="tblbox sm"><table id="sp-prod"></table></div></div></details>
+  <details class="cutbox"><summary>По менеджерам <em id="em-mgr"></em></summary>
+    <div class="cutbody"><div id="ch-mgr"></div><div class="tblbox sm"><table id="sp-mgr"></table></div></div></details>
+</div>
+
+<div class="card">
+  <h2>План-факт: площадки → каналы → интеграции <span class="hint">кликай по треугольнику, чтобы раскрыть; вправо — разбивка по неделям</span></h2>
+  <div class="ctrl">
+    <button class="btn" onclick="expandAll(1)">Развернуть всё</button>
+    <button class="btn" onclick="expandAll(0)">Свернуть всё</button>
+    <button class="btn" onclick="expandAll(2)">Только каналы</button>
+  </div>
+  <div class="tblbox"><table id="tbl"></table></div>
+  <p class="sub" id="tblnote" style="margin-top:10px"></p>
+</div>
+
+  </div>
+</details>
+
+</div><!-- /tab-main -->
+<div id="tab-attr" hidden>
+<div class="card">
+  <h2>Атрибуция публикаций без меток <span class="hint">тест · заказы по дням и публикации на одном графике</span><span id="at-qm"></span></h2>
+  <div class="alert warn" style="margin:0 0 12px"><span>🟠</span><div><b>Модель заморожена на 02.10.2026</b>Вкладка считалась старым расчётом, который был утрачен вместе с облачным контейнером. Цифры здесь — последние, что успела дать модель; основной дашборд с тех пор пересобран и мог разойтись с этой вкладкой. Модель пересобирается вместе с доработками из плана по атрибуции — до этого решения по ней не принимать.</div></div>
+  <div class="at-ctl">
+    <div><div class="sub" style="font-size:11px;margin-bottom:3px">Площадка</div>
+      <div class="seg" id="at-plat"><button data-v="Ozon" class="on">Ozon</button><button data-v="Wildberries">Wildberries</button></div></div>
+    <div><div class="sub" style="font-size:11px;margin-bottom:3px">Продукт</div>
+      <div class="seg" id="at-prod"><button data-v="atf" class="on">Аминотриггер</button><button data-v="appl">Аппликатор</button></div></div>
+    <label class="f"><span>Месяц</span><select id="at-m"></select></label>
+    <label class="f" style="min-width:140px"><span>С</span><input type="date" id="at-from"></label>
+    <label class="f" style="min-width:140px"><span>По</span><input type="date" id="at-to"></label>
+  </div>
+  <div class="at-kpis" id="at-kpis"></div>
+  <div class="at-leg" id="at-leg"></div>
+  <div id="at-chart"></div>
+</div>
+<div class="card">
+  <h2>Публикации за период <span class="hint">клик по заголовку — сортировка ▲▼, клик по строке — показать публикацию на графике</span><span id="at-tqm"></span></h2>
+  <div class="at-wrap"><table class="at-tbl" id="at-tbl"></table></div>
+</div>
+<div class="card">
+  <h2>Как считается</h2>
+  <div class="at-note" id="at-how"></div>
+</div>
+</div>
+
+<p class="sub" style="text-align:center;margin-top:24px" id="footer"></p>
+</div>
+
+<script>
+const DB=__DATA__;
+const ATTR=__ATTR__;
+const RECORDS=DB.records, META=DB.meta;
+const T={
+ bplan:'План расхода. Итог по месяцу и продукту — из «Медиаплан_Маркетинг», лист «План упрощённый». План складывается только из продуктов выбранного среза: «Только товары» — сумма планов обоих аминотриггеров и аппликатора, «Только боты» — сумма планов ботов, конкретный продукт — его собственный план. По площадкам и каналам — из медиапланов менеджеров (Елена — сайт, Анастасия — внутренняя реклама). У Елены WB и Ozon заданы одной строкой «Маркетплейс», поэтому по площадкам план не разносится.',
+ bfact:'Расход. Размещения у блогеров — колонка «Итого к оплате» в таблице менеджера, в API этого нет и не будет. Внутренняя реклама — из API рекламы Wildberries и Ozon с августа 2026.',
+ oplan:'План по заказам. Итог по месяцу и продукту — из «Медиаплан_Маркетинг», лист «План упрощённый». По площадкам и каналам — из медиапланов менеджеров.',
+ ofact:'Посевы Ozon с меткой: заказ по метке засчитывается публикации даже если она вышла в прошлом месяце — отдельной строкой «заказы по метке публикации от …». Если одна кампания стоит на нескольких публикациях, её заказы, не разошедшиеся по хвостам ссылки, делятся поровну между публикациями без своего совпадения. Авито — из API Авито: все заказы Авито Доставки вместе с отменёнными, минус самовыкупы Авито (число от Виталия). Итог по площадке — из API: Wildberries — воронка продаж, Ozon — отчёт по заказам, сайт — выгрузка заказов Тильды. Заказы сайта входят в общий итог наравне с маркетплейсами. По Ozon берём отчёт по заказам: штуки заказанного товара по дате заказа, обе схемы — FBS и FBO (со склада Ozon). Это та же цифра, что «Заказано товаров» в аналитике кабинета за выбранные даты. До 21.09 коннектор не видел FBO, и Ozon был занижен примерно на 5%. По WB расхождение с кабинетом на несколько заказов — это время суток: WB досчитывает данные в течение дня. По размещениям Ozon с распознанной меткой — факт из отчёта по внешнему трафику (плашка «факт API»). Остальные строки по каналам и блогерам — оценка из таблиц менеджеров. Внутренняя реклама — из API рекламы WB и Ozon. Самовыкупы по умолчанию исключены — переключатель в шапке.',
+ buy:'Выкупы. Авито — из API: заказы в статусах «доставлен» (delivered — покупатель получил, идёт срок проверки) и «закрыт» (closed — сделка завершена, деньги перечислены продавцу); заказы в пути выкупом не считаются. Wildberries — из API (воронка продаж). Ozon — из API заказов, когортно: берутся заказы выбранного месяца и считаются те, что дошли до статуса «доставлен». Сайт — заказы Тильды со статусом «оплачен» (есть платёж в заказе). По каналам — оценка из таблиц менеджеров. План — из общего медиаплана. На незакрытом месяце выкупы всегда занижены: часть заказов ещё едет.',
+ rev:'Выручка = сумма выкупленных товаров, а не «к выплате»: комиссии площадок нигде не вычитаются. Wildberries — прямо из API. Ozon — выкупы × средний чек по цене до скидки площадки (прикидка). Авито — сумма выкупленных заказов (delivered + closed) по цене заказа. План — из общего медиаплана.',
+ clicks:'Клики — переходы в карточку по нашим действиям. Внутренняя реклама WB и Ozon — клики по рекламе из API площадок. Посевы — клики по ссылкам Мобзио из таблиц менеджеров (где Мобзио не было — колонка «Клики WB / сайт»). Авито — просмотры карточки объявления из API Авито: это открытия объявления, а не показы в списке; отдельно платных просмотров Авито не отдаёт, но весь расход там — за размещение, поэтому все просмотры считаются оплаченными.',
+ cpo:'CPO = расход ÷ заказы. Пороги зависят от продукта, потому что средний чек разный. AMINOTRIGGERFISH (Сигнал и Прикормка): зелёный до 200 ₽, жёлтый 200–400 ₽, красный выше 400 ₽. Аппликатор Ермакова: зелёный до 800 ₽, жёлтый 801–2000 ₽, красный выше 2000 ₽. При фильтре «Все продукты» действуют пороги AMINOTRIGGERFISH.',
+ drr:'По Авито ДРР пока не считается («—»): выкупов и выручки нет до подключения API. ДРР = расход ÷ выручка от выкупов. Зелёный — до 20%, жёлтый — 20–50%, красный — выше 50%. ∞ означает, что расход есть, а выручки по этой строке нет.',
+ week:'Расход и заказы внутри периода по дате выхода публикации. При выборе месяца — по неделям, при выборе всего года — по месяцам. Внутренняя реклама раскладывается по неделям из дневного расхода API; где дневных данных нет — ровно по прошедшим дням.',
+ share:'Доля строки в общем расходе за выбранный период.',
+ sb:'Самовыкупы. WB и Ozon — из отчёта Анастасии (единственное, что берётся из её таблицы). Авито — число называет Виталий вручную, оно вычитается из заказов и выкупов Авито (сентябрь: 3). В итоговые заказы и выручку не входят — включаются переключателем «Самовыкупы» в шапке.',
+ osum:'Авито — реальная цена в заказах из API Авито (площадка не даёт скидок за свой счёт, СПП нет). Сумма заказов до выкупа, по цене ДО скидки площадки (без СПП) — это расчётная база, от которой площадка считает комиссии. Wildberries — из API. Ozon — из API заказов: за август 932 630 ₽ вместо 519 216 ₽ в выгрузке, разница и есть скидка Ozon. Сайт — колонка «Сумма заказов» у менеджеров. ПЛАН: отдельной строки под сумму заказов в медиаплане нет, поэтому берётся плановая выручка («Выручка план, ₽») — она посчитана от заказов и среднего чека, то есть по смыслу это и есть план суммы заказов до выкупа. Процент на полоске — выполнение этого плана. Процент выкупа на плитке не показывается — решено пока нигде его не выводить.',
+ aov:'Средний чек = сумма заказов ÷ количество заказов. Считается дашбордом, вручную нигде не вбивается. Сумма берётся по цене ДО скидки площадки (без СПП), поэтому чек выше того, что покупатель платит на кассе. По ботам не считается — там регистрации, а не заказы. На Ozon в одном продукте лежат два SKU, одиночная банка и комплект из 2 шт, поэтому чек по AMINOTRIGGERFISH Сигнал — смешанный: в августе одиночная 947 ₽, комплект 1 776 ₽.',
+ plc:'Сколько размещений вышло за период. «Ожидают» — законтрактовано, но ещё не опубликовано.',
+ best:'Одна строка — одна публикация (не блогер целиком): если блогер выходил дважды, будет две строки. Расход и заказы берутся из строки менеджера в его таблице за выбранный период, CPO = расход ÷ заказы, сортировка по возрастанию. Показываются все размещения в пороге, а если их меньше 20 — добираются следующие по возрастанию, чтобы блок не пустовал. Порог зависит от продукта: 400 ₽ для AMINOTRIGGERFISH, 2000 ₽ для аппликатора, а для ботов считается CPA = расход ÷ регистрации с порогом 250 ₽. Метка «сцен.» — колонка «Сценарий рекламы» из таблицы менеджера: заполняет её Мария, у Елены колонка пустая. Заказы по каналам — оценка менеджера, а не факт площадки.',
+ rplan:'План регистраций в боте. Из общего медиаплана «Медиаплан_Маркетинг», лист «План упрощённый», блок соответствующего бота. Целевая цена регистрации там задана: «Зелёный доктор» — 130 ₽, «Клёвая карта» — 150 ₽.',
+ rfact:'Регистрации в боте по каждому размещению. «Зелёный доктор» — колонка «Запустили бота» в отчёте Ани. «Умный сад» — колонка «Кол-во регистраций» в файле закупки, привязка по метке startapp=src_*. Целевое: выгрузка из самого бота по метке источника, чтобы не сверять вручную.',
+ cpa:'CPA = расход ÷ регистрации. Зелёный — дешевле 130 ₽, жёлтый — 130–250 ₽, красный — дороже 250 ₽. Пороги взяты из целевой цены регистрации в общем медиаплане.',
+ planblock:'Блок реагирует на месяц, тип, продукт и активность. При фильтре по площадке, каналу или менеджеру план скрывается — медиаплан в таком разрезе цифр не задаёт. График переключается между «План и факт рядом» и «Процент выполнения» кнопкой справа от выбора метрики. План берётся только из общего медиаплана «Медиаплан_Маркетинг», лист «План упрощённый». Первая таблица — по продуктам (у ботов вместо заказов регистрации, выкупы и выручка не считаются). Вторая — по активностям из свода медиаплана. Факт — те же данные, что в плитках сверху, итоги совпадают. Инфлюенс: расход из таблиц менеджеров, заказы по UTM-меткам — факт Ozon, по подменным артикулам WB — из отчёта кабинета WB в таблице менеджера (в API WB их нет), без метки — цифра менеджера. Внутренняя реклама — API площадок, сайт — выгрузка Тильды, Авито — таблица подрядчика. Органика — заказы площадки сверх рекламы и посевов; своего плана у неё нет, но в факт продукта и в итог она входит (отдельной строкой в разрезе активностей). Заказы, пришедшие из ботов по UTM-меткам, — отдельная активность «Бот → продажи» (расход 0, вынуты из органики); в срезе «Только боты» они показаны справочно над таблицами. По SEO, конкурсу, своему YouTube-каналу и Телеграм ADS источника факта пока нет.',
+ rate:'Рейтинг по отзывам. Wildberries — рейтинг карточки по SKU из воронки продаж, Ozon — оценка товаров продавца, Авито — рейтинг продавца (отдельной карточки Авито не отдаёт). API всех площадок отдаёт только текущее значение, поэтому при каждом обновлении данных сохраняется снимок с датой, и он встаёт точкой на свою неделю — так копится динамика (с 18.09 для WB и Ozon, с 22.09 для Авито). Ранние недели WB и Ozon — из отчёта Анастасии.',
+ leads:'Контакты Авито — сообщения и звонки покупателей по объявлениям, из API Авито. Это не заказы: заказ — оформленный заказ Авито Доставки. Цена контакта = расход Авито ÷ контакты. Позже, вместе с воронками, контакты Авито и корзины WB/Ozon станут общей метрикой «лиды».'
+};
+const qm=t=>`<span class="qm" data-t="${t.replace(/"/g,'&quot;')}">?</span>`;
+const TAGS={avito:['таблица подрядчика','t-none'],art:['артикул','t-art'],promo:['промокод','t-promo'],utm:['UTM','t-utm'],
+ mobz:['Мобзио','t-utm'],none:['нет метки','t-none'],sys:['из API','t-sys']};
+const PRODS={atf:'AMINOTRIGGERFISH Сигнал',atfp:'AMINOTRIGGERFISH Прикормка',appl:'Аппликатор Ермакова',gd:'Бот «Зелёный доктор»',us:'Бот «Умный сад»',km:'Бот «Клёвая карта»'};
+const BOTP=new Set(['gd','us','km']);
+const isBot=()=>BOTP.has(st.prod)||st.typ==='bots';
+const st={m:'2026-08',typ:'all',prod:'atf',act:'all',plat:'all',chan:'all',mgr:'all',org:'on',sb:'off',kpi:'orders',kpiT:'bar',kpiSplit:'on'};
+const MLIST=Object.keys(META.months).sort();
+try{document.addEventListener('DOMContentLoaded',()=>{
+  const e=document.getElementById('upd-d'); if(e)e.textContent=META.updated||'';
+  const b=document.getElementById('srcupd-b'); if(!b)return;
+  const now=new Date();
+  b.innerHTML=(META.srcupd||[]).map(s=>{
+    if(!s.d) return `<div class="su"><i style="background:#cbd5e1"></i><div><b>${s.n}</b><br><em>${s.w}</em></div><span>нет данных</span></div>`;
+    const dt=new Date(s.d.replace(' ','T')), h=(now-dt)/36e5;
+    const ok=s.ok||30, col=h<ok?'#16a34a':h<ok*2?'#d97706':'#dc2626';
+    const ds=s.d.slice(8,10)+'.'+s.d.slice(5,7)+' '+s.d.slice(11);
+    const ago=h<1?'только что':h<24?`${Math.round(h)} ч назад`:`${Math.round(h/24)} дн назад`;
+    return `<div class="su"><i style="background:${col}"></i><div><b>${s.n}</b><br><em>${s.w}</em></div><span>${ds}<br><em style="font-weight:400">${ago}</em></span></div>`;
+  }).join('');
+});}catch(e){}
+// по умолчанию — текущий месяц (по дате устройства); если его ещё нет в данных — последний доступный
+{const d=new Date(), cm=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+ st.m=MLIST.includes(cm)?cm:MLIST.filter(m=>m<=cm).pop()||MLIST[MLIST.length-1];}
+const CH={};['plat','chan','prod','mgr'].forEach(k=>CH[k]={ms:['spend'],t:'line',off:new Set(),sig:''});
+const TOTCOL='#7c3aed';
+const METRICS=[['spend','Расход','money'],['orders','Заказы','n'],['osum','Сумма заказов','money'],
+ ['buyouts','Выкупы','n'],['revenue','Выручка','money'],['clicks','Клики','n'],['plc','Размещений','n'],
+ ['cpo','CPO','money'],['drr','ДРР','pct'],['reg','Регистрации','n'],['cpa','Цена регистрации','money'],['aov','Средний чек','money']];
+const isAll=()=>st.m==='all';
+const cols=()=>isAll()?MLIST.map(m=>META.months[m].label.replace(' 2026','')):META.months[st.m].weeks;
+function recWv(r){
+  if(!isAll()) return r.w;
+  const t=r.w.reduce((a,x)=>x.map((v,i)=>a[i]+v),Z5());
+  return MLIST.map(m=>m===r.m?t:Z5());
+}
+
+function rateOf(mi,i){
+  const R=META.rating||{}, prod=st.prod==='all'?'atf':st.prod;
+  const pick=(mm,pl)=>{const a=((R[mm]||{})[pl]||{})[prod]; return a||null;};
+  return {pick};
+}
+function ratePlat(pl,i){
+  const R=META.rating||{}, prod=st.prod==='all'?'atf':st.prod;
+  if(isAll()){const mm=MLIST[i], a=((R[mm]||{})[pl]||{})[prod];
+    if(!a)return null; for(let j=4;j>=0;j--) if(a[j])return a[j]; return null;}
+  const a=((R[st.m]||{})[pl]||{})[prod];
+  return a&&a[i]?a[i]:null;
+}
+function rateLast(pl){
+  const R=META.rating||{}, prod=st.prod==='all'?'atf':st.prod;
+  let best=null;
+  MLIST.forEach(mm=>{const a=((R[mm]||{})[pl]||{})[prod]; if(!a)return;
+    a.forEach((v,i)=>{if(v)best={v,when:(META.months[mm].weeks[i]||'')};});});
+  return best;
+}
+const stars=v=>{let s='';for(let i=1;i<=5;i++)s+=`<span style="color:${v>=i-0.25?'#f59e0b':'#e2e8f0'}">★</span>`;return s;};
+const fmt=n=>!n?'—':Math.round(n).toLocaleString('ru-RU');
+const rub=n=>!n?'—':Math.round(n).toLocaleString('ru-RU')+' ₽';
+const cpo=(s,o)=>o?Math.round(s/o):0;
+const CPOLIM={atf:[200,400],atfp:[200,400],appl:[800,2000]};
+const limOf=p=>CPOLIM[p]||CPOLIM.atf;
+const cpoC=(c,p)=>{if(!c)return'';const L=limOf(p);return c<L[0]?'good':c<=L[1]?'warn':'bad';};
+const drrC=(s,r)=>{if(!s)return'';if(!r)return'bad';const d=drr(s,r);return d<20?'good':d<=50?'warn':'bad';};
+const drr=(s,r)=>r?Math.round(s/r*100):0;
+const cpaC=c=>!c?'':c<130?'good':c<=250?'warn':'bad';
+
+const Z5=()=>[0,0,0,0,0,0,0,0];
+const sum5=(a,b)=>a.map((v,i)=>v+b[i]);
+const aggW=(list,keepInfo)=>{const L=keepInfo?list:list.filter(x=>!x.info);
+  return cols().map((_,i)=>L.reduce((a,x)=>sum5(a,x.w[i]||Z5()),Z5()));};
+const totOf=w=>w.reduce((a,x)=>sum5(a,x),Z5());
+
+function opts(sel,list,cur){
+  sel.innerHTML=list.map(o=>`<option value="${o[0]}"${o[0]===cur?' selected':''}>${o[1]}</option>`).join('');
+}
+const SERVICE=new Set(['Органика','Самовыкупы']);
+const typOK=r=>st.typ==='all'||(st.typ==='bots'?BOTP.has(r.prod):!BOTP.has(r.prod));
+function buildFilters(){
+  opts(document.getElementById('f-m'),[...MLIST.map(k=>[k,META.months[k].label]),['all','Весь 2026 год']],st.m);
+  document.getElementById('f-typ').value=st.typ;
+  document.getElementById('f-org').value=st.org;
+  const inM=RECORDS.filter(r=>(isAll()||r.m===st.m)&&typOK(r));
+  // продукт попадает в фильтр, если по нему есть факт ИЛИ задан план (новый продукт до запуска)
+  const planProds=new Set();
+  (isAll()?MLIST:[st.m]).forEach(m=>{const P=META.plans&&META.plans[m];
+    if(P&&P.prod)Object.keys(P.prod).forEach(k=>planProds.add(k))});
+  const prods=[...new Set([...inM.map(r=>r.prod),...planProds])]
+    .filter(p=>st.typ==='all'||(st.typ==='bots'?BOTP.has(p):!BOTP.has(p)))
+    .sort((a,b)=>Object.keys(PRODS).indexOf(a)-Object.keys(PRODS).indexOf(b));
+  opts(document.getElementById('f-prod'),[['all','Все продукты'],...prods.map(p=>[p,PRODS[p]||p])],st.prod);
+  const base=inM.filter(r=>st.prod==='all'||r.prod===st.prod);
+  const acts=[...new Set(base.map(r=>r.act).filter(Boolean))];
+  (META.actmap?Object.values(META.actmap):[]).forEach(a=>{if(!acts.includes(a))acts.push(a)});
+  opts(document.getElementById('f-act'),[['all','Все активности'],...acts.map(x=>[x,x])],st.act);
+  const ba=base.filter(r=>st.act==='all'||r.act===st.act);
+  opts(document.getElementById('f-plat'),[['all','Все площадки'],...[...new Set(ba.map(r=>r.plat))].map(x=>[x,x])],st.plat);
+  const b2=ba.filter(r=>st.plat==='all'||r.plat===st.plat);
+  const chans=[...new Set(b2.map(r=>r.chan))].filter(c=>!SERVICE.has(c));
+  opts(document.getElementById('f-chan'),[['all','Все каналы'],...chans.map(x=>[x,x])],st.chan);
+  const b3=b2.filter(r=>st.chan==='all'||r.chan===st.chan);
+  opts(document.getElementById('f-mgr'),[['all','Все менеджеры'],...[...new Set(b3.map(r=>r.mgr))].map(x=>[x,x==='—'?'Без менеджера':x])],st.mgr);
+}
+function sel(ignoreProd){
+  return RECORDS.filter(r=>(isAll()||r.m===st.m)&&typOK(r)
+    &&(ignoreProd||st.prod==='all'||r.prod===st.prod)
+    &&(st.act==='all'||r.act===st.act)
+    &&(st.plat==='all'||r.plat===st.plat)
+    &&(st.chan==='all'||r.chan===st.chan||(SERVICE.has(r.chan)&&st.chan==='all'))
+    &&(st.mgr==='all'||r.mgr===st.mgr)
+    &&!(st.org==='off'&&r.chan==='Органика'))
+    .map(r=>({...r,w:recWv(r),info:st.sb==='on'?false:r.info}));
+}
+const PLORDER=['Wildberries','Ozon','Сайт trigger-fish.ru','Бот','Авито','Прочие активности','Не указано'];
+function buildTree(recs){
+  const months=isAll()?MLIST:[st.m];
+  // план суммируется только по продуктам выбранного типа: «Только боты» — сумма планов ботов, «Только товары» — сумма товаров
+  const prods=(st.prod==='all'?['atf','atfp','appl','gd','us','km']:[st.prod]).filter(p=>st.typ==='all'||(st.typ==='bots'?BOTP.has(p):!BOTP.has(p)));
+  const sumPlan=(sec,key)=>{let r=null;
+    months.forEach(m=>{const P=META.plans[m]; if(!P)return;
+      prods.forEach(p=>{const src=sec==='prod'?(P.prod||{})[p]:((P[sec]||{})[p]||{})[key];
+        if(!src)return; r=r||{b:0,o:0,buy:0,rev:0,r:0};
+        r.b+=src.b||0; r.o+=src.o||0; r.buy+=src.buy||0; r.rev+=src.rev||0; r.r+=src.r||0;});});
+    return r&&r.b?r:null;};
+  const totPlan=sumPlan('prod');
+  PLANTOT=totPlan;
+  const wide=st.plat==='all'&&st.chan==='all'&&st.mgr==='all';
+  const platOK=st.chan==='all'&&st.mgr==='all', chanOK=st.mgr==='all';
+  const out=[];
+  PLORDER.concat([...new Set(recs.map(r=>r.plat))].filter(p=>!PLORDER.includes(p))).forEach(p=>{
+    const ls=recs.filter(r=>r.plat===p); if(!ls.length) return;
+    const cm={}; ls.forEach(l=>{(cm[l.chan]=cm[l.chan]||[]).push(l)});
+    const chans=Object.keys(cm).sort((a,b)=>{
+      const sa=/Самовыкуп/.test(a)?2:/Органик|Прямые|реклама/.test(a)?1:0,
+            sb=/Самовыкуп/.test(b)?2:/Органик|Прямые|реклама/.test(b)?1:0;
+      if(sa!==sb) return sa-sb;
+      return totOf(aggW(cm[b]))[0]-totOf(aggW(cm[a]))[0];
+    }).map(c=>{
+      const kids=cm[c].slice().sort((x,y)=>totOf(y.w)[0]-totOf(x.w)[0]).map((k,i)=>({...k,w:k.w,id:`${p}|${c}|${i}`,lvl:2}));
+      const info=kids.some(k=>k.info);
+      return {name:c,sys:/Органик|Прямые|реклама|Самовыкуп/.test(c),info,kids,w:aggW(kids,true),
+              plan:chanOK?sumPlan('chan',c):null,id:`${p}|${c}`,lvl:1};
+    });
+    let pplan=platOK?sumPlan('plat',p):null;
+    // план площадки суммируем из каналов только если он задан для ВСЕХ её каналов —
+    // иначе получилось бы, что план одной внутренней рекламы сравнивается с фактом всей площадки
+    if(!pplan&&platOK&&chans.length&&chans.every(c=>c.plan&&c.plan.b)){
+      const acc={b:0,o:0,buy:0,rev:0,r:0};
+      chans.forEach(c=>['b','o','buy','rev','r'].forEach(k=>acc[k]+=c.plan[k]||0));
+      if(acc.b) pplan=acc;
+    }
+    out.push({name:p,plan:pplan,kids:chans,w:aggW(chans),id:p,lvl:0});
+  });
+  return {tree:out,total:{name:'ИТОГО',plan:wide?totPlan:null,w:aggW(out)}};
+}
+
+// ---------- ячейки ----------
+function metricCells(w,plan,noRev){
+  const t=totOf(w), [s,o,b,r,cl]=t, rg=t[7]||0;
+  const cO=o?Math.round(s/o):0, cR=rg?Math.round(s/rg):0, d=drr(s,r);
+  const pO=plan&&plan.o?plan.o:null, pR=plan&&plan.r?plan.r:null;
+  let h='';
+  h+=`<td class="pf">${plan&&plan.b?rub(plan.b):'—'}</td>`;
+  h+=`<td>${rub(s)}${plan&&plan.b?`<div class="pf">${Math.round(s/plan.b*100)}% плана</div>`:''}</td>`;
+  h+=`<td class="pf">${pO?fmt(pO):'—'}</td>`;
+  h+=`<td>${fmt(o)}${pO?`<div class="pf">${Math.round(o/pO*100)}% плана</div>`:''}</td>`;
+  h+=`<td class="pf">${pR?fmt(pR):'—'}</td>`;
+  h+=`<td>${fmt(rg)}${pR?`<div class="pf">${Math.round(rg/pR*100)}% плана</div>`:''}</td>`;
+  h+=`<td>${fmt(b)}</td><td>${rub(r)}</td><td>${fmt(cl)}</td>`;
+  h+=`<td class="${cpoC(cO,st.prod)}">${cO?rub(cO):'—'}</td>`;
+  h+=`<td class="${cpaC(cR)}">${cR?rub(cR):'—'}</td>`;
+  const noSale=(!o&&rg>0)||(noRev===true);
+  h+=`<td class="${noSale?'':drrC(s,r)}">${noSale?'—':(s?(r?d+'%':'∞'):'—')}</td>`;
+  w.forEach(x=>{const xo=WKREG?(x[7]||0):x[1], wc=xo&&x[0]?Math.round(x[0]/xo):0;
+    h+=`<td class="gs">${rub(x[0])}</td><td>${fmt(xo)}</td><td class="${WKREG?cpaC(wc):cpoC(wc,st.prod)}">${wc?rub(wc):'—'}</td>`});
+  return h;
+}
+function nameCell(n,hasKids,leaf){
+  const tg=hasKids?`<span class="tg" onclick="tog('${n.id}')" id="tg-${CSS.escape(n.id)}">▸</span>`:'<span class="tg"></span>';
+  const title=leaf&&leaf.link?`<a href="${leaf.link}" target="_blank" rel="noopener">${n.name}</a>`:n.name;
+  let sub='';
+  if(leaf){
+    const t=TAGS[leaf.tag]||null;
+    const parts=[leaf.date,leaf.mgr!=='—'?leaf.mgr:null].filter(Boolean).join(' · ');
+    sub=`<small>${parts}${t?` <span class="tag ${t[1]}">${t[0]}</span>`:''}${leaf.src==='api'?' <span class="tag t-art">факт API</span>':(leaf.est?' <span class="tag t-none">оценка</span>':'')}${leaf.info?' <span class="tag t-sys">не в итоге</span>':''}${leaf.leads?(()=>{const L=leaf.leads.reduce((a,v,i)=>a+((leaf.w[i]&&(leaf.w[i][0]||leaf.w[i][1]))?v:0),0),S=totOf(leaf.w)[0];return `<br>контакты ${fmt(L)}${leaf.msgs!=null?` (сообщений ${fmt(leaf.msgs)}, звонков ${fmt(leaf.calls||0)})`:''}${L&&S?` · цена контакта ${rub(Math.round(S/L))}`:''} <span class="tag t-art">API Авито</span>`})():''}</small>`;
+  }
+  return `${tg}<span class="nm">${title}${sub}</span>`;
+}
+const WK=()=>cols();
+let WKREG=false;   // в недельных колонках показывать регистрации вместо заказов
+function head(){
+  let h=`<thead><tr><th class="c0">Площадка / канал / размещение</th>
+  <th>Бюджет<br>план${qm(T.bplan)}</th><th>Бюджет<br>факт${qm(T.bfact)}</th>
+  <th>Заказы<br>план${qm(T.oplan)}</th><th>Заказы<br>факт${qm(T.ofact)}</th>
+  <th>Рег.<br>план${qm(T.rplan)}</th><th>Рег.<br>факт${qm(T.rfact)}</th>
+  <th>Выкупы${qm(T.buy)}</th><th>Выручка${qm(T.rev)}</th><th>Клики${qm(T.clicks)}</th>
+  <th>CPO${qm(T.cpo)}</th><th>CPA${qm(T.cpa)}</th><th>ДРР${qm(T.drr)}</th>`;
+  WK().forEach(w=>h+=`<th class="gs" colspan="3" style="text-align:center">${w}${qm(T.week)}</th>`);
+  h+=`</tr><tr><th class="c0"></th>${'<th></th>'.repeat(12)}`;
+  WK().forEach(()=>h+=`<th class="gs">расход</th><th>${WKREG?'рег.':'зак.'}</th><th>${WKREG?'CPA':'CPO'}</th>`);
+  return h+`</tr></thead>`;
+}
+let open=new Set();
+function renderTable(model){
+  let h=head()+'<tbody>';
+  model.tree.forEach(p=>{
+    h+=`<tr class="lv0" data-id="${p.id}"><td class="c0">${nameCell(p,true)}</td>${metricCells(p.w,p.plan)}</tr>`;
+    p.kids.forEach(c=>{
+      h+=`<tr class="lv1 row${c.info?' info':''}" data-id="${c.id}" data-par="${p.id}"><td class="c0">${nameCell(c,c.kids.length>1||!c.sys)}</td>${metricCells(c.w,c.plan)}</tr>`;
+      c.kids.forEach(k=>{
+        h+=`<tr class="lv2 row" data-id="${k.id}" data-par="${c.id}"><td class="c0">${nameCell(k,false,k)}</td>${metricCells(k.w,null)}</tr>`;
+      });
+    });
+  });
+  h+=`</tbody><tfoot><tr><td class="c0">ИТОГО</td>${metricCells(model.total.w,model.total.plan)}</tr></tfoot>`;
+  document.getElementById('tbl').innerHTML=model.tree.length?h:'<tbody><tr><td class="empty">За выбранный период данных нет</td></tr></tbody>';
+  vis();
+}
+function vis(){
+  document.querySelectorAll('tr.row').forEach(tr=>{
+    const par=tr.dataset.par, gp=par.includes('|')?par.split('|')[0]:null;
+    tr.style.display=(open.has(par)&&(!gp||open.has(gp)))?'':'none';
+  });
+  document.querySelectorAll('.tg[id]').forEach(t=>{
+    const id=t.id.slice(3); if(id) t.textContent=open.has(id)?'▾':'▸';
+  });
+}
+function tog(id){open.has(id)?open.delete(id):open.add(id);vis();}
+function expandAll(mode){
+  open=new Set();
+  if(mode>=1) MODEL.tree.forEach(p=>{open.add(p.id); if(mode===1)p.kids.forEach(c=>open.add(c.id));});
+  vis();
+}
+// ---------- разрезы ----------
+const KPILAB={reg:['Регистрации','n'],cpa:['CPA','money'],plc:['Размещений','n'],aov:['Средний чек','money'],selfbuy:['Самовыкупы','n'],spend:['Расход','money'],orders:['Заказы','n'],osum:['Сумма заказов','money'],buyouts:['Выкупы','n'],
+ revenue:['Выручка','money'],clicks:['Клики','n'],cpo:['CPO','money'],drr:['ДРР','pct'],rate:['Рейтинг карточек','rate'],leads:['Контакты Авито','n']};
+// ---------- разбивка бюджета по блокам (плитка «Бюджет») ----------
+const STACKK=['spend','orders','osum','clicks'];          // складываются — можно стопкой
+const RATIOK=['aov','cpo','drr'];                          // доли/средние — только рядом или линиями
+const SPLITK=STACKK.concat(RATIOK);
+const SPB=[
+ {n:'Внутренняя реклама Ozon',col:'#16a34a',f:r=>r.act==='Внутренняя реклама'&&r.plat==='Ozon'},
+ {n:'Внутренняя реклама WB',col:'#2563eb',f:r=>r.act==='Внутренняя реклама'&&r.plat==='Wildberries'},
+ {n:'Авито',alt:{spend:'Продвижение Авито'},col:'#ea580c',f:r=>r.act==='Авито'},
+ {n:'Органика',col:'#64748b',f:r=>r.act==='Органика'},
+ {n:'Посев → Ozon',col:'#7c3aed',f:r=>r.act==='Инфлюенс-посев'&&r.plat==='Ozon'},
+ {n:'Посев → Wildberries',col:'#0891b2',f:r=>r.act==='Инфлюенс-посев'&&r.plat==='Wildberries'},
+ {n:'Посев → сайт',col:'#d97706',f:r=>r.act==='Инфлюенс-посев'&&String(r.plat||'').indexOf('Сайт')===0},
+ {n:'Боты — закупка трафика',col:'#db2777',f:r=>r.plat==='Бот'},
+ {n:'Боты → продажи',col:'#be123c',f:r=>r.act==='Бот → продажи'}
+];
+let KPIOFF=new Set(), SPTIP=[];
+const SPLAB=k=>k==='drr'?'ДРР от суммы заказов':((KPILAB[k]||['',''])[0]||'');
+// ДРР по источникам считаем от СУММЫ ЗАКАЗОВ, а не от выручки: выручка по источникам
+// пока не разнесена (у строк внутренней рекламы она нулевая, всё лежит в органике).
+function bval(x,key){
+  if(key==='drr') return x[6]?x[0]/x[6]*100:null;
+  return mval(x,key);
+}
+function blockSeries(key){
+  const src=sel().filter(r=>!r.info).map(r=>({...r,w:recWv(r)}));
+  const ratio=RATIOK.includes(key), needSpend=(key==='cpo'||key==='drr');
+  const used=new Set(); const out=[];
+  const mk=(rs,name,col)=>{
+    if(!rs.length)return;
+    const W=aggW(rs,true);
+    if(needSpend&&!W.some(x=>x[0]>0))return;            // бесплатные источники в CPO и ДРР не показываем
+    const v=W.map(x=>{const q=bval(x,key); return ratio?(q==null?null:q):(q||0);});
+    if(v.some(x=>x!=null&&x>0)) out.push({name,col,v});
+  };
+  SPB.forEach(b=>{
+    const rs=src.filter(r=>!used.has(r)&&b.f(r)); rs.forEach(r=>used.add(r));
+    mk(rs,(b.alt&&b.alt[key])||b.n,b.col);
+  });
+  mk(src.filter(r=>!used.has(r)),'Прочее','#94a3b8');
+  return out;
+}
+function togKpi(nm){ const k=st.kpi+'|'+nm; if(KPIOFF.has(k))KPIOFF.delete(k); else KPIOFF.add(k); renderKpiChart(); }
+function setKpiSplit(){ st.kpiSplit=st.kpiSplit==='on'?'off':'on'; renderKpiChart(); }
+function setKpi(k){st.kpi=k;render();}
+function setKpiT(t){st.kpiT=t;renderKpiChart();}
+function renderKpiChart(){
+  const L=cols(), n=L.length, key=st.kpi, lab=KPILAB[key]||KPILAB.orders;
+  const W=980,H=190,pl=84,pr=16,pt=22,pb=26;
+  let series=[];
+  if(key==='selfbuy'){
+    const pick=pl=>{const rs=sel().filter(r=>r.chan==='Самовыкупы'&&r.plat===pl).map(r=>({...r,w:recWv(r)}));
+      const w=aggW(rs,true); return w.map(x=>x[1]||null);};
+    series=[{name:'Wildberries',col:'#2563eb',v:pick('Wildberries')},{name:'Ozon',col:'#16a34a',v:pick('Ozon')},{name:'Авито',col:'#ea580c',v:pick('Авито')}];
+  } else if(key==='rate'){
+    series=[{name:'Wildberries',col:'#2563eb',v:L.map((_,i)=>ratePlat('Wildberries',i))},
+            {name:'Ozon',col:'#16a34a',v:L.map((_,i)=>ratePlat('Ozon',i))},
+            {name:'Авито',col:'#ea580c',v:L.map((_,i)=>ratePlat('Авито',i))}];
+  } else if(key==='leads'){
+    const rs=sel().filter(r=>r.plat==='Авито'&&r.leads);
+    const v=isAll()?MLIST.map(m=>rs.filter(r=>r.m===m).reduce((a,r)=>a+r.leads.reduce((x,y)=>x+y,0),0)||null)
+                   :[0,1,2,3,4].map(i=>rs.reduce((a,r)=>a+(r.leads[i]||0),0)||null);
+    series=[{name:'Контакты Авито',col:'#ea580c',v}];
+  } else if(SPLITK.includes(key)&&st.kpiSplit==='on'){
+    series=blockSeries(key);
+  } else {
+    series=[{name:lab[0],col:TOTCOL,v:MODEL.total.w.map(x=>mval(x,key))}];
+  }
+  const split=(SPLITK.includes(key)&&st.kpiSplit==='on'&&series.length>0);
+  const allSeries=series;
+  const offK=nm=>KPIOFF.has(key+'|'+nm);
+  if(split) series=series.filter(se=>!offK(se.name));
+  const stacked=split&&st.kpiT==='bar'&&STACKK.includes(key);
+  const ratioK=RATIOK.includes(key);
+  if(split){
+    SPTIP=L.map((l,i)=>{
+      const row=(se,right)=>`<div style="display:flex;gap:6px;align-items:center;margin-top:3px${offK(se.name)?';opacity:.45':''}"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${se.col};flex:none"></i><span>${se.name}</span><b style="margin-left:auto">${mfmt(se.v[i],lab[1])}</b>${right}</div>`;
+      let h=`<div style="font-weight:650">${l}</div>`;
+      if(ratioK){
+        const all=MODEL.total.w[i], ov=key==='drr'?bval(all,'drr'):mval(all,key);
+        h+=`<div style="margin-top:2px">${SPLAB(key)} в среднем: <b>${mfmt(ov,lab[1])}</b></div>`;
+        const list=allSeries.filter(se=>se.v[i]!=null);
+        list.sort((a,b)=>key==='aov'?b.v[i]-a.v[i]:a.v[i]-b.v[i]);
+        list.forEach(se=>h+=row(se,''));
+        if(!list.length) h+='<div style="opacity:.7;margin-top:3px">за этот период данных нет</div>';
+        if(key==='drr') h+='<div style="opacity:.7;margin-top:5px;font-size:11px">ДРР здесь — расход ÷ сумма заказов. Выручка по источникам пока не разнесена.</div>';
+      } else {
+        const tt=allSeries.reduce((a,se)=>a+(se.v[i]||0),0);
+        h+=`<div style="margin-top:2px">${lab[0]} всего: <b>${mfmt(tt,lab[1])}</b></div>`;
+        allSeries.filter(se=>(se.v[i]||0)>0).sort((a,b)=>b.v[i]-a.v[i]).forEach(se=>
+          h+=row(se,`<span style="opacity:.65;min-width:34px;text-align:right">${tt?Math.round(se.v[i]/tt*100):0}%</span>`));
+        if(!tt) h+='<div style="opacity:.7;margin-top:3px">за этот период данных нет</div>';
+      }
+      return h;
+    });
+  }
+  let mx=0,mn=Infinity;
+  if(stacked){for(let i=0;i<n;i++){let a=0;series.forEach(se=>a+=(se.v[i]||0));if(a>mx)mx=a;} mn=0;}
+  series.forEach(s=>s.v.forEach(v=>{if(v!=null){if(v>mx)mx=v;if(v<mn)mn=v;}}));
+  if(!isFinite(mn))mn=0;
+  if(!mx)mx=1;
+  let lo=0, hi=mx;
+  if(key==='selfbuy'){
+    const pick=pl=>{const rs=sel().filter(r=>r.chan==='Самовыкупы'&&r.plat===pl).map(r=>({...r,w:recWv(r)}));
+      const w=aggW(rs,true); return w.map(x=>x[1]||null);};
+    series=[{name:'Wildberries',col:'#2563eb',v:pick('Wildberries')},{name:'Ozon',col:'#16a34a',v:pick('Ozon')},{name:'Авито',col:'#ea580c',v:pick('Авито')}];
+  } else if(key==='rate'){lo=Math.max(0,Math.floor((mn-0.3)*10)/10); hi=Math.min(5,Math.ceil((mx+0.2)*10)/10); if(hi<=lo)hi=lo+0.5;}
+  else {const st2=Math.pow(10,Math.floor(Math.log10(mx))); hi=Math.ceil(mx/st2*2)/2*st2;}
+  const X=i=>n>1?pl+i*(W-pl-pr)/(n-1):W/2, Y=v=>pt+(1-(v-lo)/(hi-lo))*(H-pt-pb);
+  const slot=(W-pl-pr)/n;
+  const bars=st.kpiT==='bar';
+  let s=`<svg class="ch" viewBox="0 0 ${W} ${H}">`;
+  for(let g=0;g<=3;g++){const v=lo+(hi-lo)*g/3,y=Y(v);
+    s+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/>`+
+       `<text class="axl" x="${pl-8}" y="${y+3}" text-anchor="end">${mfmt(v,lab[1]==='rate'?'n1':lab[1])}</text>`;}
+  const lx=bars?(i=>pl+slot*i+slot/2):X;
+  L.forEach((l,i)=>s+=`<text class="axl" x="${lx(i)}" y="${H-7}" text-anchor="middle">${l}</text>`);
+  if(stacked){
+    const bw=slot*0.62;
+    for(let i=0;i<n;i++){
+      const tt=series.reduce((a,se)=>a+(se.v[i]||0),0);
+      const x=pl+slot*i+slot*0.19;
+      s+=`<rect x="${x}" y="${pt}" width="${bw}" height="${Math.max(1,Y(lo)-pt)}" fill="transparent" onmousemove="showTipRaw(SPTIP[${i}],this)" onmouseleave="hideTip()"/>`;
+      if(!tt) continue;
+      let acc=0;
+      series.forEach(se=>{const v=se.v[i]||0; if(v<=0)return;
+        const y0=Y(acc), y1=Y(acc+v); acc+=v;
+        const hh=y0-y1;
+        s+=`<rect x="${x}" y="${y1}" width="${bw}" height="${Math.max(1,hh>4?hh-1:hh)}" fill="${se.col}" onmousemove="showTipRaw(SPTIP[${i}],this)" onmouseleave="hideTip()"><title>${se.name}</title></rect>`;});
+      s+=`<text class="axl" x="${x+bw/2}" y="${Y(tt)-6}" text-anchor="middle" style="fill:#475569;font-weight:600;pointer-events:none">${mfmt(tt,lab[1])}</text>`;
+    }
+  } else if(bars){
+    const m=series.length, bw=slot*0.62/m;
+    for(let i=0;i<n;i++) series.forEach((se,j)=>{
+      const v=se.v[i]; if(v==null||v<=0)return;
+      const x=pl+slot*i+slot*0.19+j*bw;
+      s+=`<rect x="${x}" y="${Y(v)}" width="${Math.max(2,bw-(m>1?3:0))}" height="${Math.max(1,Y(lo)-Y(v))}" fill="${se.col}" rx="3"/>`;
+      s+=`<text class="axl" x="${x+bw/2}" y="${Y(v)-6}" text-anchor="middle" style="fill:${m>1?se.col:'#475569'};font-weight:600">${mfmt(v,lab[1]==='rate'?'n1':lab[1])}</text>`;});
+  } else {
+    series.forEach(se=>{let d='',prev=false;
+      se.v.forEach((v,i)=>{if(v==null){prev=false;return;} d+=(prev?'L':'M')+X(i)+','+Y(v)+' '; prev=true;});
+      s+=`<path d="${d}" fill="none" stroke="${se.col}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+      se.v.forEach((v,i)=>{if(v==null)return;
+        s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.6" fill="#fff" stroke="${se.col}" stroke-width="2"/>`;
+        if(series.length<=2) s+=`<text class="axl" x="${X(i)}" y="${Y(v)-8}" text-anchor="middle" style="fill:${se.col};font-weight:600">${mfmt(v,lab[1]==='rate'?'n1':lab[1])}</text>`;});});
+  }
+  // зоны наведения на график-линию: подсказка с составом бюджета за период
+  if(split&&!bars){
+    for(let i=0;i<n;i++){
+      const x0=i===0?pl:(X(i-1)+X(i))/2, x1=i===n-1?(W-pr):(X(i)+X(i+1))/2;
+      s+=`<rect x="${x0}" y="${pt}" width="${Math.max(1,x1-x0)}" height="${Math.max(1,Y(lo)-pt)}" fill="transparent" onmousemove="showTipRaw(SPTIP[${i}],this)" onmouseleave="hideTip()"/>`;
+    }
+  }
+  s+='</svg>';
+  const leg=key==='rate'?series.map(se=>`<span class="lg"><i style="background:${se.col}"></i>${se.name}</span>`).join('')
+    :(split?allSeries.map(se=>`<span class="lg${offK(se.name)?' off':''}" style="cursor:pointer" onclick="togKpi('${se.name.replace(/'/g,"\\'")}')"><i style="background:${se.col}"></i>${se.name}</span>`).join(''):'');
+  const ic=st.kpiT==='bar'
+    ?'<g fill="currentColor"><rect x="1" y="7" width="3" height="6" rx="1"/><rect x="5.5" y="3" width="3" height="10" rx="1"/><rect x="10" y="9" width="3" height="4" rx="1"/></g>'
+    :'<polyline points="1,11 5,6 9,8 13,2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>';
+  const nx=st.kpiT==='bar'?'line':'bar';
+  const btn=`<button class="cyc" onclick="setKpiT('${nx}')" data-t="Вид: ${st.kpiT==='bar'?'столбцы':'линия'}. Нажми — переключится на ${nx==='bar'?'столбцы':'линию'}"><svg viewBox="0 0 14 14">${ic}</svg></button>`;
+  const spIc='<g fill="currentColor"><rect x="1" y="2" width="12" height="3" rx="1"/><rect x="1" y="6" width="8" height="3" rx="1" opacity=".6"/><rect x="1" y="10" width="5" height="3" rx="1" opacity=".35"/></g>';
+  const what=SPLAB(key).toLowerCase();
+  const spBtn=SPLITK.includes(key)?`<button class="cyc${st.kpiSplit==='on'?' act':''}" onclick="setKpiSplit()" data-t="${st.kpiSplit==='on'?'Разложено по источникам. Нажми — свернётся в общий итог':'Показан общий итог. Нажми — разложу '+what+' по источникам'}"><svg viewBox="0 0 14 14">${spIc}</svg></button>`:'';
+  const hint=split?(ratioK?(st.kpiT==='bar'?'Столбики рядом — по источникам, складывать их нельзя. Наведи на период, чтобы увидеть все значения'
+                                            :'Каждая линия — свой источник. Наведи на период, чтобы сравнить. Клик по названию убирает источник')
+                          :(st.kpiT==='bar'?'Наведи на столбец — покажу состав. Клик по названию в легенде убирает источник из расчёта'
+                                           :'Каждая линия — свой источник. Клик по названию в легенде убирает источник')):
+                   'Кликни по любой плашке выше, чтобы посмотреть её динамику';
+  document.getElementById('kpichart').innerHTML=
+    `<div style="display:flex;align-items:center;gap:10px"><div><h4>${split?SPLAB(key):lab[0]} ${isAll()?'по месяцам':'по неделям'}</h4>
+     <p>${hint}</p></div><div style="margin-left:auto;display:flex;gap:6px">${spBtn}${btn}</div></div>
+     ${leg?'<div class="leg" style="margin-bottom:6px">'+leg+'</div>':''}${s}`;
+}
+function pendOf(name){
+  const P=META.pend||{}; let n=0,s=0;
+  (isAll()?MLIST:[st.m]).forEach(m=>{const v=P[m+'|'+name]; if(v){n+=v[0];s+=v[1];}});
+  return n?[n,s]:null;
+}
+function splitTable(el,rows,color,opt){
+  opt=opt||{};
+  const mx=Math.max(1,...rows.map(r=>totOf(r.w)[0])), tt=rows.reduce((a,r)=>a+totOf(r.w)[0],0);
+  let h=`<thead><tr><th class="c0"></th><th>Размещ.${qm(T.plc)}</th>`;
+  if(opt.pend) h+=`<th>Ожидают${qm(T.plc)}</th>`;
+  h+=`<th>Расход${qm(T.bfact)}</th><th>Доля${qm(T.share)}</th>
+  <th>Заказы${qm(T.ofact)}</th><th>Рег.${qm(T.rfact)}</th><th>Сумма<br>заказов${qm(T.osum)}</th><th>Выкупы${qm(T.buy)}</th><th>Выручка${qm(T.rev)}</th>
+  <th>Клики${qm(T.clicks)}</th><th>CPO${qm(T.cpo)}</th><th>CPA${qm(T.cpa)}</th><th>ДРР${qm(T.drr)}</th>`;
+  if(opt.rate) h+=`<th>Рейтинг${qm(T.rate)}</th>`;
+  WK().forEach(w=>h+=`<th class="gs" colspan="${opt.rate?3:2}" style="text-align:center">${w}${qm(T.week)}</th>`);
+  h+=`</tr><tr><th class="c0"></th>${'<th></th>'.repeat(opt.pend?13:12)}${opt.rate?'<th></th>':''}`;
+  WK().forEach(()=>h+=`<th class="gs">расход</th><th>${WKREG?'рег.':'зак.'}</th>${opt.rate?'<th>рейт.</th>':''}`);
+  h+=`</tr></thead><tbody>`;
+  rows.forEach(r=>{
+    const tt0=totOf(r.w), [S,O,B,R,C,P,OS]=tt0, RG=tt0[7]||0;
+    const cO=O?Math.round(S/O):0, cR=RG?Math.round(S/RG):0, d=drr(S,R);
+    const noSale=!O&&RG>0;
+    const dt=noSale?'—':(S?(R?d+'%':'∞'):'—');
+    h+=`<tr${r.info?' class="info"':''}><td class="c0"><b>${r.name}</b>${r.info?' <span class="tag t-sys">не в итоге</span>':''}<div class="mbar"><i style="width:${S/mx*100}%;background:${color}"></i></div></td>`;
+    h+=`<td>${fmt(P)}</td>`;
+    if(opt.pend){const pd=pendOf(r.name); h+=`<td class="pf">${pd?fmt(pd[0])+' · '+rub(pd[1]):'—'}</td>`;}
+    h+=`<td>${rub(S)}</td><td class="pf">${tt?Math.round(S/tt*100)+'%':'—'}</td><td>${fmt(O)}</td><td>${fmt(RG)}</td><td>${rub(OS)}</td><td>${fmt(B)}</td>`;
+    h+=`<td>${rub(R)}</td><td>${fmt(C)}</td><td class="${cpoC(cO,st.prod)}">${cO?rub(cO):'—'}</td><td class="${cpaC(cR)}">${cR?rub(cR):'—'}</td><td class="${noSale?'':drrC(S,R)}">${dt}</td>`;
+    if(opt.rate){const lr=rateLast(r.name); h+=`<td>${lr?'<b>'+lr.v.toFixed(1)+'</b> '+stars(lr.v):'—'}</td>`;}
+    r.w.forEach((x,i)=>{h+=`<td class="gs">${rub(x[0])}</td><td>${fmt(WKREG?(x[7]||0):x[1])}</td>`;
+      if(opt.rate){const rv=ratePlat(r.name,i); h+=`<td class="pf">${rv?rv.toFixed(1):'—'}</td>`;}});
+    h+='</tr>';
+  });
+  const tw=aggW(rows.filter(r=>!r.info)), tt1=totOf(tw), [S,O,B,R,C,P,OS]=tt1, RG=tt1[7]||0;
+  const d=drr(S,R);
+  h+=`</tbody><tfoot><tr><td class="c0">Итого</td><td>${fmt(P)}</td>`;
+  if(opt.pend){let n=0,s=0; rows.forEach(r=>{const pd=pendOf(r.name); if(pd){n+=pd[0];s+=pd[1];}});
+    h+=`<td>${n?fmt(n)+' · '+rub(s):'—'}</td>`;}
+  h+=`<td>${rub(S)}</td><td>100%</td><td>${fmt(O)}</td><td>${fmt(RG)}</td><td>${rub(OS)}</td><td>${fmt(B)}</td><td>${rub(R)}</td><td>${fmt(C)}</td>
+  <td class="${cpoC(O?Math.round(S/O):0,st.prod)}">${O?rub(Math.round(S/O)):'—'}</td>
+  <td class="${cpaC(RG?Math.round(S/RG):0)}">${RG?rub(Math.round(S/RG)):'—'}</td>
+  <td class="${drrC(S,R)}">${S?(R?d+'%':'∞'):'—'}</td>`;
+  if(opt.rate) h+='<td>—</td>';
+  tw.forEach((x,i)=>{h+=`<td class="gs">${rub(x[0])}</td><td>${fmt(WKREG?(x[7]||0):x[1])}</td>${opt.rate?'<td>—</td>':''}`});
+  document.getElementById(el).innerHTML=h+`</tr></tfoot>`;
+}
+
+// ---------- графики разрезов ----------
+const PAL=['#2563eb','#16a34a','#d97706','#dc2626','#0891b2','#db2777','#65a30d','#475569','#c026d3','#0d9488','#a16207','#e11d48'];
+const CHTYPES=[['line','Линии'],['bar','Столбцы'],['stack','Стопка']];
+let CUT={};
+function mval(x,k){
+  if(k==='spend')return x[0]; if(k==='orders')return x[1]; if(k==='buyouts')return x[2];
+  if(k==='revenue')return x[3]; if(k==='clicks')return x[4]; if(k==='plc')return x[5]; if(k==='osum')return x[6];
+  if(k==='cpo')return x[1]?x[0]/x[1]:null;
+  if(k==='drr')return x[3]?x[0]/x[3]*100:null;
+  if(k==='reg')return x[7]||0;
+  if(k==='cpa')return x[7]?x[0]/x[7]:null;
+  if(k==='aov')return x[1]?x[6]/x[1]:null;
+  return 0;
+}
+function mfmt(v,t){if(v==null)return'—';if(t==='n1')return (Math.round(v*10)/10).toFixed(1);
+  return t==='money'?rub(Math.round(v)):t==='pct'?Math.round(v)+'%':fmt(Math.round(v));}
+function seriesOf(key){
+  const src=CUT[key]||[];
+  return [{name:'Итого',w:aggW(src.filter(r=>!r.info)),tot:true,col:TOTCOL},
+          ...src.map((r,i)=>({...r,col:PAL[i%PAL.length]}))];
+}
+function drawChart(key,src){
+  CUT[key]=src;
+  const st2=CH[key];
+  let rows=seriesOf(key);
+  const sig=rows.map(r=>r.name).join('|');
+  if(st2.sig!==sig){ st2.sig=sig; st2.off=new Set();
+    const top=src.slice().sort((a,b)=>totOf(b.w)[0]-totOf(a.w)[0]).slice(0,5).map(r=>r.name);
+    src.forEach(r=>{if(!top.includes(r.name))st2.off.add(r.name)});
+  }
+  const MS=[METRICS.find(m=>m[0]===st2.ms[0])], L=cols(), n=L.length;
+  const mt=MS[0], type=mt[2];
+  const isStack=st2.t==='stack'&&st2.ms[0]!=='cpo'&&st2.ms[0]!=='drr';
+  const W=980,H=250,pl=88,pr=16,pt=14,pb=30;
+  let vis=rows.filter(r=>!st2.off.has(r.name));
+  if(isStack) vis=vis.filter(r=>!r.tot);
+  let mx=0;
+  if(isStack){for(let i=0;i<n;i++){let s=0;vis.forEach(r=>{const v=mval(r.w[i],st2.ms[0]);if(v>0)s+=v});if(s>mx)mx=s;}}
+  else vis.forEach(r=>r.w.forEach(x=>{const v=mval(x,st2.ms[0]); if(v!=null&&v>mx)mx=v;}));
+  if(!mx)mx=1;
+  const step=Math.pow(10,Math.floor(Math.log10(mx))), top=Math.ceil(mx/step*2)/2*step;
+  const X=i=>n>1?pl+i*(W-pl-pr)/(n-1):W/2, Y=v=>pt+(1-v/top)*(H-pt-pb);
+  const slot=(W-pl-pr)/n, BX=i=>pl+slot*i;
+  let s=`<svg class="ch" viewBox="0 0 ${W} ${H}">`;
+  for(let g=0;g<=4;g++){const v=top*g/4,y=Y(v);
+    s+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/>`+
+       `<text class="axl" x="${pl-8}" y="${y+3}" text-anchor="end">${mfmt(v,type)}</text>`;}
+  const lx=st2.t==='line'?X:(i=>BX(i)+slot/2);
+  L.forEach((l,i)=>{s+=`<text class="axl" x="${lx(i)}" y="${H-8}" text-anchor="middle">${l}</text>`});
+  if(st2.t==='line'){
+    rows.forEach(r=>{ if(st2.off.has(r.name))return;
+      let d='',prev=false;
+      r.w.forEach((x,i)=>{const v=mval(x,st2.ms[0]);
+        if(v==null){prev=false;return;} d+=(prev?'L':'M')+X(i)+','+Y(v)+' '; prev=true;});
+      s+=`<path d="${d}" fill="none" stroke="${r.col}" stroke-width="${r.tot?2.8:2}" stroke-linejoin="round" stroke-linecap="round"/>`;
+      r.w.forEach((x,i)=>{const v=mval(x,st2.ms[0]); if(v==null)return;
+        s+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${r.tot?3.8:3.2}" fill="#fff" stroke="${r.col}" stroke-width="2"/>`;});
+    });
+  } else if(isStack){
+    for(let i=0;i<n;i++){let acc=0;
+      vis.forEach(r=>{const v=mval(r.w[i],st2.ms[0])||0; if(v<=0)return;
+        const y0=Y(acc), y1=Y(acc+v); acc+=v;
+        s+=`<rect x="${BX(i)+slot*0.18}" y="${y1}" width="${slot*0.64}" height="${Math.max(1,y0-y1)}" fill="${r.col}" rx="2"/>`;});}
+  } else {
+    const m=vis.length||1, bw=slot*0.72/m;
+    for(let i=0;i<n;i++){
+      vis.forEach((r,j)=>{const v=mval(r.w[i],st2.ms[0]); if(!v)return;
+        s+=`<rect x="${BX(i)+slot*0.14+j*bw}" y="${Y(v)}" width="${Math.max(1,bw-1.5)}" height="${Math.max(1,Y(0)-Y(v))}" fill="${r.col}" rx="2"/>`;});}
+  }
+  const half=st2.t==='line'?(n>1?(W-pl-pr)/(n-1)/2:(W-pl-pr)/2):slot/2;
+  L.forEach((l,i)=>{const cx=lx(i), x0=Math.max(pl-half,cx-half), w0=Math.min(half*2,W-pr-x0);
+    s+=`<g class="sl" onmouseover="chartTip('${key}',${i},this)" onmouseout="hideTip()">`+
+       `<line x1="${cx}" x2="${cx}" y1="${pt}" y2="${H-pb}"/>`+
+       `<rect x="${x0}" y="${pt}" width="${w0}" height="${H-pt-pb}" fill="transparent"/></g>`;});
+  s+='</svg>';
+  const leg=rows.filter(r=>!(isStack&&r.tot)).map(r=>
+    `<span class="lg${st2.off.has(r.name)?' off':''}${r.tot?' tot':''}" onclick="togSeries('${key}','${r.name.replace(/'/g,"\\'")}')"><i style="background:${r.col}"></i>${r.name}</span>`).join('');
+  const ICONS={
+    line:'<polyline points="1,11 5,6 9,8 13,2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>',
+    bar:'<g fill="currentColor"><rect x="1" y="7" width="3" height="6" rx="1"/><rect x="5.5" y="3" width="3" height="10" rx="1"/><rect x="10" y="9" width="3" height="4" rx="1"/></g>',
+    stack:'<g fill="currentColor"><rect x="2" y="9" width="10" height="4" rx="1"/><rect x="2" y="5.5" width="10" height="3" rx="1" opacity=".6"/><rect x="2" y="2" width="10" height="3" rx="1" opacity=".33"/></g>'};
+  const nextT=CHTYPES[(CHTYPES.findIndex(t=>t[0]===st2.t)+1)%CHTYPES.length];
+  const seg=`<button class="cyc" onclick="setType('${key}','${nextT[0]}')" data-t="Вид графика: ${CHTYPES.find(t=>t[0]===st2.t)[1]}. Нажми — переключится на «${nextT[1]}»"><svg viewBox="0 0 14 14">${ICONS[st2.t]}</svg></button>`;
+  const dd=`<select onchange="setMetric('${key}',this.value)">`+
+    METRICS.map(m=>`<option value="${m[0]}"${m[0]===st2.ms[0]?' selected':''}>${m[1]}</option>`).join('')+`</select>`;
+  document.getElementById('ch-'+key).innerHTML=`<div class="chead">${dd}${seg}<div class="leg">${leg}</div></div>${s}`;
+}
+function setType(k,t){CH[k].t=t;drawChart(k,CUT[k]);}
+function setMetric(k,v){CH[k].ms=[v];drawChart(k,CUT[k]);}
+function togSeries(k,n){const o=CH[k].off; o.has(n)?o.delete(n):o.add(n); drawChart(k,CUT[k]);}
+
+function groupBy(recs,key,label){
+  const m={};
+  recs.forEach(r=>{const k=key(r); (m[k]=m[k]||{name:label?label(k):k,items:[]}).items.push(r)});
+  return Object.values(m).map(g=>{const inf=g.items.every(i=>i.info);
+    return {name:g.name,info:inf,w:aggW(g.items,inf)};})
+    .sort((a,b)=>(a.info?1:0)-(b.info?1:0)||totOf(b.w)[0]-totOf(a.w)[0]);
+}
+// ---------- рендер ----------
+let MODEL=null,PLANTOT=null;
+
+// ---------- график план-факт для блока «План месяца» ----------
+const PCH={prod:{m:'o',t:'pct'},act:{m:'o',t:'pct'}};
+const PMET=[['b','Бюджет','money'],['o','Заказы','n'],['r','Регистрации','n'],['buy','Выкупы','n'],['rev','Выручка','money'],['c','CPO','money'],['a','CPA','money']];
+const PTYPES=[['bar','План и факт рядом'],['pct','Процент выполнения']];
+function pmVal(row,k){
+  const pl=row.pl||{}, ft=row.ft||Z5();
+  if(k==='b')  return [pl.b||0, ft[0]];
+  if(k==='o')  return [pl.o||0, ft[1]];
+  if(k==='r')  return [pl.r||0, ft[7]||0];
+  if(k==='buy')return [pl.buy||0, ft[2]];
+  if(k==='rev')return [pl.rev||0, ft[3]];
+  if(k==='c')  return [pl.o&&pl.b?pl.b/pl.o:0, ft[1]?ft[0]/ft[1]:0];
+  if(k==='a')  return [pl.r&&pl.b?pl.b/pl.r:0, ft[7]?ft[0]/ft[7]:0];
+  return [0,0];
+}
+function setPM(k,v){PCH[k].m=v;renderPlanBlock();}
+function setPT(k,v){PCH[k].t=v;renderPlanBlock();}
+function drawPlanChart(key,rows){
+  const c=PCH[key], mt=PMET.find(m=>m[0]===c.m)||PMET[0], type=mt[2];
+  const data=rows.map(r=>{const [p,f]=pmVal(r,c.m); return {name:r.name,p,f};})
+                 .filter(d=>d.p||d.f);
+  const W=980,H=230,pl=150,pr=16,pt=16,pb=52;
+  let sv='';
+  if(!data.length){ sv=`<svg class="ch" viewBox="0 0 ${W} 90"><text class="axl" x="${W/2}" y="50" text-anchor="middle">по этой метрике данных нет</text></svg>`; }
+  else if(c.t==='pct'){
+    const rowH=30, hh=Math.max(90,pt+data.length*rowH+18);
+    sv=`<svg class="ch" viewBox="0 0 ${W} ${hh}">`;
+    const x0=pl, xw=W-pl-pr-60;
+    sv+=`<line class="grid" x1="${x0+xw}" x2="${x0+xw}" y1="${pt-6}" y2="${pt+data.length*rowH}"/>`;
+    data.forEach((d,i)=>{
+      const y=pt+i*rowH, pct=d.p?Math.round(d.f/d.p*100):null;
+      const col=pct==null?'#cbd5e1':pct>=100?'#16a34a':pct>=60?'#d97706':'#dc2626';
+      sv+=`<text class="axl" x="${x0-10}" y="${y+16}" text-anchor="end">${d.name.length>22?d.name.slice(0,21)+'…':d.name}</text>`;
+      sv+=`<rect x="${x0}" y="${y+5}" width="${xw}" height="15" fill="#eef2f7" rx="3"/>`;
+      if(pct!=null) sv+=`<rect x="${x0}" y="${y+5}" width="${Math.max(1,Math.min(pct,100)/100*xw)}" height="15" fill="${col}" rx="3"/>`;
+      sv+=`<text class="axl" x="${x0+xw+10}" y="${y+16}" style="font-weight:700;fill:${col}">${pct==null?'плана нет':pct+'%'}</text>`;
+    });
+    sv+='</svg>';
+  } else {
+    let mx=0; data.forEach(d=>{mx=Math.max(mx,d.p,d.f)});
+    if(!mx)mx=1;
+    const step=Math.pow(10,Math.floor(Math.log10(mx))), top=Math.ceil(mx/step*2)/2*step;
+    const bl=92, n=data.length, slot=(W-bl-pr)/n, Y=v=>pt+(1-v/top)*(H-pt-pb), BX=i=>bl+slot*i;
+    sv=`<svg class="ch" viewBox="0 0 ${W} ${H}">`;
+    for(let g=0;g<=4;g++){const v=top*g/4,y=Y(v);
+      sv+=`<line class="grid" x1="${bl}" x2="${W-pr}" y1="${y}" y2="${y}"/>`+
+          `<text class="axl" x="${bl-8}" y="${y+3}" text-anchor="end">${mfmt(v,type)}</text>`;}
+    const bw=slot*0.62/2;
+    data.forEach((d,i)=>{
+      const cx=BX(i)+slot/2;
+      [['p','#cbd5e1'],['f',TOTCOL]].forEach((sd,j)=>{
+        const v=d[sd[0]]; if(!v)return;
+        sv+=`<rect x="${cx-slot*0.31+j*bw}" y="${Y(v)}" width="${Math.max(1,bw-2)}" height="${Math.max(1,Y(0)-Y(v))}" fill="${sd[1]}" rx="2"/>`;});
+      const nm=d.name.length>16?d.name.slice(0,15)+'…':d.name;
+      sv+=`<text class="axl" x="${cx}" y="${H-32}" text-anchor="middle">${nm}</text>`;
+      const pct=d.p?Math.round(d.f/d.p*100):null;
+      sv+=`<text class="axl" x="${cx}" y="${H-16}" text-anchor="middle" style="font-weight:600">${pct==null?'':pct+'%'}</text>`;
+    });
+    sv+='</svg>';
+  }
+  const nextT=PTYPES[(PTYPES.findIndex(t=>t[0]===c.t)+1)%PTYPES.length];
+  const ic=c.t==='bar'
+    ? '<g fill="currentColor"><rect x="1" y="6" width="3" height="7" rx="1" opacity=".45"/><rect x="4.6" y="3" width="3" height="10" rx="1"/><rect x="9" y="8" width="3" height="5" rx="1" opacity=".45"/></g>'
+    : '<g fill="currentColor"><rect x="1" y="2.5" width="12" height="3" rx="1.5" opacity=".35"/><rect x="1" y="2.5" width="8" height="3" rx="1.5"/><rect x="1" y="8.5" width="12" height="3" rx="1.5" opacity=".35"/><rect x="1" y="8.5" width="4.5" height="3" rx="1.5"/></g>';
+  const dd=`<select onchange="setPM('${key}',this.value)">`+
+    PMET.map(m=>`<option value="${m[0]}"${m[0]===c.m?' selected':''}>${m[1]}</option>`).join('')+`</select>`;
+  const btn=`<button class="cyc" onclick="setPT('${key}','${nextT[0]}')" data-t="Вид: ${PTYPES.find(t=>t[0]===c.t)[1]}. Нажми — переключится на «${nextT[1]}»"><svg viewBox="0 0 14 14">${ic}</svg></button>`;
+  const leg=c.t==='bar'?`<div class="leg"><span class="lg"><i style="background:#cbd5e1"></i>План</span><span class="lg"><i style="background:${TOTCOL}"></i>Факт</span></div>`:'';
+  document.getElementById('pch-'+key).innerHTML=`<div class="chead">${dd}${btn}${leg}</div>${sv}`;
+}
+
+// ---------- блок «План месяца» ----------
+const ACTFACT={
+ 'Инфлюенс-маркетинг':r=>!/Внутренняя реклама|Органик|Самовыкуп/.test(r.chan)&&r.plat!=='Авито'&&r.plat!=='Прочие активности',
+ 'ВБ внутренняя':r=>r.chan==='Внутренняя реклама WB',
+ 'Ozon внутренняя':r=>r.chan==='Внутренняя реклама Ozon',
+ 'Авито':r=>r.plat==='Авито'};
+const ACTNAME={'Конкурс репостов в вк':'Конкурс репостов в ВК'};
+function planMonths(){return isAll()?MLIST:[st.m];}
+function planCell(pv,fv,f){
+  const pct=pv?Math.round(fv/pv*100):null;
+  return `<td class="pf">${pv?f(pv):'—'}</td><td>${fv?f(fv):'—'}${pct!=null?`<div class="pf">${pct}%</div>`:''}</td>`;
+}
+function planHead(){
+  return `<thead><tr><th class="c0"></th>
+   <th>Бюджет<br>план</th><th>Бюджет<br>факт</th>
+   <th>Заказы<br>план</th><th>Заказы<br>факт</th>
+   <th>Рег.<br>план</th><th>Рег.<br>факт</th>
+   <th>Выкупы<br>план</th><th>Выкупы<br>факт</th>
+   <th>Выручка<br>план</th><th>Выручка<br>факт</th>
+   <th>CPO<br>план</th><th>CPO<br>факт</th>
+   <th>CPA<br>план</th><th>CPA<br>факт</th></tr></thead><tbody>`;
+}
+function bar(pv,fv,lbl){
+  const p=pv?Math.round(fv/pv*100):null;
+  const c=p==null?'#cbd5e1':p>=100?'#16a34a':p>=60?'#d97706':'#dc2626';
+  return `<div class="mbar" data-t="${lbl}: факт ${fmt(fv)} из плана ${pv?fmt(pv):'—'}${p!=null?` — ${p}%`:' (плана нет)'}"><i style="width:${p==null?0:Math.min(p,100)}%;background:${c}"></i></div>`;
+}
+function planRow(name,pl,ft,isB,note,prodKey){
+  pl=pl||{};
+  const pO=pl.o||0, pR=pl.r||0, fO=ft[1], fR=ft[7]||0;
+  const pC=pO&&pl.b?Math.round(pl.b/pO):0, fC=fO?Math.round(ft[0]/fO):0;
+  const pA=pR&&pl.b?Math.round(pl.b/pR):0, fA=fR?Math.round(ft[0]/fR):0;
+  let h=`<tr${note==='сверх плана'?' class="info"':''}><td class="c0"><b>${name}</b>${note?` <span class="tag t-sys">${note}</span>`:''}`;
+  h+=bar(isB?pR:pO,isB?fR:fO,isB?'Регистрации':'Заказы')+'</td>';
+  h+=planCell(pl.b||0,ft[0],rub);
+  h+=planCell(pO,fO,fmt)+planCell(pR,fR,fmt);
+  h+=planCell(pl.buy||0,ft[2],fmt)+planCell(pl.rev||0,ft[3],rub);
+  h+=`<td class="pf">${pC?rub(pC):'—'}</td><td class="${cpoC(fC,prodKey||st.prod)}">${fC?rub(fC):'—'}</td>`;
+  h+=`<td class="pf">${pA?rub(pA):'—'}</td><td class="${cpaC(fA)}">${fA?rub(fA):'—'}</td>`;
+  return h+'</tr>';
+}
+function planFoot(tp,tf,isB){
+  const pC=tp.o&&tp.b?Math.round(tp.b/tp.o):0, fC=tf[1]?Math.round(tf[0]/tf[1]):0;
+  const pA=tp.r&&tp.b?Math.round(tp.b/tp.r):0, fA=tf[7]?Math.round(tf[0]/tf[7]):0;
+  let h=`</tbody><tfoot><tr><td class="c0">Итого${bar(tp.o||tp.r,tp.o?tf[1]:tf[7],tp.o?'Заказы':'Регистрации')}</td>`;
+  h+=planCell(tp.b,tf[0],rub)+planCell(tp.o,tf[1],fmt)+planCell(tp.r,tf[7],fmt);
+  h+=planCell(tp.buy||0,tf[2],fmt)+planCell(tp.rev||0,tf[3],rub);
+  h+=`<td class="pf">${pC?rub(pC):'—'}</td><td class="${cpoC(fC,st.prod)}">${fC?rub(fC):'—'}</td>`;
+  h+=`<td class="pf">${pA?rub(pA):'—'}</td><td class="${cpaC(fA)}">${fA?rub(fA):'—'}</td>`;
+  return h+'</tr></tfoot>';
+}
+function renderOzUtm(){
+  const box=document.getElementById('oztbl'); if(!box)return;
+  const U=META.ozutm||{}, MS=isAll()?MLIST:[st.m];
+  const agg={};
+  MS.forEach(m=>(U[m]||[]).forEach(x=>{
+    const a=agg[x.camp]=agg[x.camp]||{camp:x.camp,s:0,cart:0,o_sess:0,o_attr:0,sum:0,who:new Set()};
+    a.s+=x.s; a.cart+=x.cart; a.o_sess+=x.o_sess; a.o_attr+=x.o_attr; a.sum+=x.sum;
+    (x.who||[]).forEach(w=>a.who.add(w));}));
+  const rows=Object.values(agg).sort((a,b)=>b.o_attr-a.o_attr||b.s-a.s);
+  if(!rows.length){ box.innerHTML='<tbody><tr><td class="empty">За выбранный период меток нет</td></tr></tbody>';
+    document.getElementById('oznote').textContent='Внешний трафик Ozon отдаётся с августа 2026.'; return; }
+  let h=`<thead><tr><th class="d">Метка utm_campaign</th><th>Сессии</th><th>Корзины</th>
+    <th>Заказы<br>в сессии</th><th>Заказы<br>окно атрибуции</th><th>Сумма заказов</th><th class="w">Привязка к размещению</th></tr></thead><tbody>`;
+  let T={s:0,cart:0,o_sess:0,o_attr:0,sum:0}, nm=0;
+  rows.forEach(r=>{
+    const who=[...r.who];
+    if(who.length) nm++;
+    h+=`<tr><td class="d">${r.camp.replace('vendor_org_4202727','…')}</td>
+      <td>${fmt(r.s)}</td><td>${fmt(r.cart)}</td><td>${fmt(r.o_sess)}</td>
+      <td><b>${fmt(r.o_attr)}</b></td><td>${rub(r.sum)}</td>
+      <td class="w">${who.length?who.slice(0,3).join(', ')+(who.length>3?` и ещё ${who.length-3}`:''):'<span class="tag t-none">нет в таблицах</span>'}</td></tr>`;
+    ['s','cart','o_sess','o_attr','sum'].forEach(k=>T[k]+=r[k]);
+  });
+  h+=`</tbody><tfoot><tr><td class="d">Итого</td><td>${fmt(T.s)}</td><td>${fmt(T.cart)}</td>
+    <td>${fmt(T.o_sess)}</td><td><b>${fmt(T.o_attr)}</b></td><td>${rub(T.sum)}</td>
+    <td class="w">${nm} из ${rows.length} меток найдено в таблицах менеджеров</td></tr></tfoot>`;
+  box.innerHTML=h;
+  document.getElementById('oznote').textContent=
+    `Факт из API Ozon: сколько людей пришло по внешним ссылкам и сколько заказали. «В сессии» — купил сразу за тот же заход, «окно атрибуции» — перешёл, ушёл и купил позже; вторая цифра честнее отражает отдачу от посева, её и берём за основу. Суммы Ozon отдаёт без учёта своих акций. Привязка к размещению — по метке из колонки «Ссылка с UTM»: короткие ссылки ozon.onelink.me раскрываются до полной, длинные читаются по параметру c=. ${nm} из ${rows.length} меток связано с размещениями — по ним заказы и сумма в основной таблице заменены на факт Ozon, остальные строки остались с оценкой менеджера.`;
+}
+
+function renderPlanBlock(){
+  const MS=planMonths();
+  const narrow=st.plat!=='all'||st.chan!=='all'||st.mgr!=='all'||st.act!=='all';
+  // тот же набор строк, что и у плиток сверху (включая органику, если она не выключена фильтром)
+  const all=sel().filter(r=>!r.info);
+  const paid=all.filter(r=>r.chan!=='Органика');
+  const sumP=(get)=>{const a={b:0,o:0,r:0,buy:0,rev:0};let any=false;
+    MS.forEach(m=>{const P=META.plans[m]; if(!P)return; const v=get(P); if(!v)return;
+      any=true;['b','o','r','buy','rev'].forEach(k=>a[k]+=v[k]||0);});
+    return any?a:null;};
+  const factOf=rs=>{const a=Z5(); rs.forEach(r=>r.w.forEach(x=>x.forEach((v,i)=>a[i]+=v))); return a;};
+  // --- продукты ---
+  const codes=[...new Set([...Object.keys(PRODS),...all.map(r=>r.prod)])]
+    .filter(c=>(st.prod==='all'||c===st.prod)&&(st.typ==='all'||(st.typ==='bots'?BOTP.has(c):!BOTP.has(c))));
+  let rowsP='',tp={b:0,o:0,r:0,buy:0,rev:0},tf=Z5(),nP=0;
+  const chP=[];
+  codes.forEach(c=>{
+    const pl=narrow?null:sumP(P=>(P.prod||{})[c]);
+    const ft=factOf(all.filter(r=>r.prod===c));
+    if(!pl&&!ft[0]&&!ft[1]&&!ft[7])return;
+    nP++;
+    chP.push({name:PRODS[c]||c,pl:pl||{},ft,bot:BOTP.has(c)});
+    rowsP+=planRow(PRODS[c]||c,pl,ft,BOTP.has(c),
+      (!pl&&(ft[0]||ft[1]||ft[7]))?(narrow?'':'плана нет'):((pl&&!ft[0]&&!ft[1]&&!ft[7])?'факта нет':''),c);
+    if(pl)['b','o','r','buy','rev'].forEach(k=>tp[k]+=pl[k]||0);
+    ft.forEach((v,i)=>tf[i]+=v);
+  });
+  const orgP=factOf(all.filter(r=>r.chan==='Органика'));
+  document.getElementById('pl-prod').innerHTML=planHead()+rowsP+planFoot(tp,tf,false);
+  document.getElementById('em-pp').textContent=`${nP} продуктов · план ${rub(tp.b)} · факт ${rub(tf[0])}`+
+    (tp.b?` · ${Math.round(tf[0]/tp.b*100)}% бюджета`:'');
+  // --- активности ---
+  const NOSRC=new Set(['SEO-продвижение','Конкурс репостов в ВК','Свой YouTube-канал','Бартер','Таргет ВК','Контекст','Телеграм ADS']);
+  const AM=META.actmap||{};
+  const actAgg={};   // имя активности -> план
+  MS.forEach(m=>{const P=META.plans[m]; if(!P||!P.act)return;
+    Object.entries(P.act).forEach(([key,per])=>{
+      const nm=AM[key]||key;
+      Object.entries(per).forEach(([prod,v])=>{
+        if(st.prod!=='all'&&prod!==st.prod)return;
+        if(st.typ==='bots'&&!BOTP.has(prod))return;
+        if(st.typ==='goods'&&BOTP.has(prod))return;
+        const x=actAgg[nm]=actAgg[nm]||{b:0,o:0,r:0,buy:0,rev:0};
+        x.b+=v.b||0; if(BOTP.has(prod))x.r+=v.o||0; else x.o+=v.o||0;});});});
+  const actNames=[...new Set([...Object.keys(actAgg),...paid.map(r=>r.act).filter(Boolean)])];
+  let rowsA='',ap={b:0,o:0,r:0,buy:0,rev:0},af=Z5(),noSrc=0;
+  const chA=[];
+  actNames.forEach(nm=>{
+    if(st.act!=='all'&&nm!==st.act) return;
+    const pl=narrow?null:(actAgg[nm]&&actAgg[nm].b?actAgg[nm]:null);
+    const ft=factOf(paid.filter(r=>r.act===nm));
+    if(!pl&&!ft[0]&&!ft[1]&&!ft[7])return;
+    const noS=NOSRC.has(nm)&&!ft[0]&&!ft[1];
+    if(noS&&pl)noSrc+=pl.b;
+    chA.push({name:nm,pl:pl||{},ft,bot:false});
+    rowsA+=planRow(nm,pl,ft,false,noS?'нет источника факта':((!pl&&!narrow)?'плана нет':''));
+    if(pl)['b','o','r','buy','rev'].forEach(k=>ap[k]+=pl[k]||0);
+    ft.forEach((v,i)=>af[i]+=v);
+  });
+  let extraA='';
+  if(orgP[1]||orgP[3]||orgP[7]){ extraA=planRow('Органика',null,orgP,false,'в медиаплане нет'); chA.push({name:'Органика',pl:{},ft:orgP,bot:false}); orgP.forEach((v,i)=>af[i]+=v); }
+  document.getElementById('pl-act').innerHTML=planHead()+rowsA+extraA+planFoot(ap,af,false);
+  document.getElementById('em-pa').textContent=`${chA.length} активностей · план ${rub(ap.b)} · факт ${rub(af[0])}`+
+    (noSrc?` · ${rub(noSrc)} без источника факта`:'');
+  renderOzUtm();
+  // боты как источник продаж: справочно, в регистрации не складывается
+  let botNote='';
+  if(st.typ!=='goods'){
+    const bs={};
+    RECORDS.filter(r=>(isAll()||r.m===st.m)&&r.act==='Бот → продажи').forEach(r=>{
+      const k=r.chan.replace('Бот ',''), x=bs[k]=bs[k]||{};
+      const y=x[r.plat]=x[r.plat]||[0,0]; r.w.forEach(w=>{y[0]+=w[1];y[1]+=w[6];});});
+    const ks=Object.keys(bs);
+    if(ks.length) botNote=`<div class="alert" style="margin:0 0 12px"><span>🤖</span><div><b>Боты привели заказов (справочно, в регистрации не складывается)</b>`+
+      ks.map(k=>`«${k}»: `+Object.entries(bs[k]).map(([p,v])=>`${p.replace('Сайт trigger-fish.ru','сайт')} — ${fmt(v[0])} на ${rub(v[1])}`).join(', ')).join('; ')+
+      `. Это заказы товара по UTM-меткам ботов; в срезе «Только товары» они видны каналом «Бот …».</div></div>`;
+  }
+  document.getElementById('plwarn').innerHTML=botNote+(narrow
+    ? `<div class="alert warn" style="margin:0 0 12px"><span>🟠</span><div><b>План в этом разрезе не задан</b>Медиаплан задаёт цифры только по месяцу, продукту и активности. Сейчас выбран фильтр по площадке, каналу или менеджеру — план скрыт, показан только отфильтрованный факт.</div></div>`
+    : '');
+  drawPlanChart('prod',chP); drawPlanChart('act',chA);
+  document.getElementById('plan-qm').innerHTML=qm(T.planblock);
+  document.getElementById('plnote').textContent='Плановые цифры — из «Медиаплан_Маркетинг», лист «План упрощённый». Факт считается по тем же данным, что и плитки сверху, поэтому итоги совпадают: у продукта — все его заказы, выкупы и выручка, включая органику; в разрезе активностей органика идёт отдельной строкой и входит в итог. Своего плана у органики нет — медиаплан построен от бюджета, а у органики бюджета нет. Если выключить органику фильтром, она уйдёт и отсюда, как из плиток. Заказы и регистрации никогда не складываются: заказы — у товаров, регистрации — у ботов. Пометка «нет источника факта» значит, что этой активностью занимается не инфлюенс-команда и данных по ней в дашборде нет.';
+}
+
+function render(){
+  buildFilters();
+  const recs=sel();
+  MODEL=buildTree(recs);
+  // сколько процентов месяца прошло — ориентир к проценту выполнения плана
+  (()=>{const e=document.getElementById('upd-p'); if(!e)return;
+    if(isAll()){e.textContent='весь год'; return;}
+    const [y,mo]=st.m.split('-').map(Number), dim=new Date(y,mo,0).getDate(), now=new Date();
+    const past=(now.getFullYear()>y||(now.getFullYear()===y&&now.getMonth()+1>mo));
+    const day=past?dim:(now.getFullYear()===y&&now.getMonth()+1===mo?now.getDate():0);
+    e.textContent=`прошло ${Math.round(day/dim*100)}% месяца (${day} из ${dim} дн.)`;})();
+  document.getElementById('subtitle').innerHTML=
+    `${isAll()?'Весь 2026 год':META.months[st.m].label} · ${st.prod==='all'?'все продукты':PRODS[st.prod]} · план-факт и разбивка ${isAll()?'по месяцам':'по неделям'} &nbsp;<span class="badge">${isBot()?'ФАКТ ИЗ ОТЧЁТОВ ПО БОТАМ':'ФАКТ ИЗ ТАБЛИЦ МЕНЕДЖЕРОВ + WB API'}</span>`;
+  // KPI
+  const [S,O,B,R,C,P,OS]=totOf(MODEL.total.w), plan=MODEL.total.plan;
+  const d=drr(S,R);
+  const REG=recs.reduce((a,r)=>a+totOf(r.w)[7],0);
+  const pO=plan&&plan.o?plan.o:null, pR=plan&&plan.r?plan.r:null;
+  const cO=O?cpo(S,O):0, cR=REG?Math.round(S/REG):0;
+  const cards=[
+   ['Бюджет',rub(S),plan&&plan.b?`план ${rub(plan.b)}`:'план не задан для этого среза',plan&&plan.b?Math.round(S/plan.b*100):null,T.bfact],
+   ['Заказы',fmt(O),pO?`план ${fmt(pO)}`:'план не задан',pO?Math.round(O/pO*100):null,T.ofact],
+   ['Регистрации',fmt(REG),pR?`план ${fmt(pR)}`:'план не задан',pR?Math.round(REG/pR*100):null,T.rfact],
+   ['Сумма заказов',rub(OS),(plan&&plan.rev?`план ${rub(plan.rev)}`:'план не задан'),
+     plan&&plan.rev?Math.round(OS/plan.rev*100):null,T.osum],
+   ['Средний чек',O?rub(Math.round(OS/O)):'—',O?'сумма заказов ÷ заказы':'только по товарам',null,T.aov],
+   ['Выкупы',fmt(B),plan&&plan.buy?`план ${fmt(plan.buy)}`:'план не задан',
+     plan&&plan.buy?Math.round(B/plan.buy*100):null,T.buy],
+   ['Выручка',rub(R),plan&&plan.rev?`план ${rub(plan.rev)}`:'от выкупов',
+     plan&&plan.rev?Math.round(R/plan.rev*100):null,T.rev],
+   ['Клики',fmt(C),'реклама WB/Ozon, Мобзио, просмотры Авито',null,T.clicks],
+   ['CPO факт',cO?rub(cO):'—',pO&&plan.b?`план ${rub(Math.round(plan.b/pO))}`:'расход ÷ заказы',null,T.cpo,cpoC(cO,st.prod)],
+   ['CPA факт',cR?rub(cR):'—',pR&&plan.b?`цель ${rub(Math.round(plan.b/pR))}`:'расход ÷ регистрации',null,T.cpa,cpaC(cR)],
+   ['ДРР',S?(R?d+'%':'∞'):'—',plan&&plan.rev&&plan.b?`цель ${Math.round(plan.b/plan.rev*100)}%`:'расход ÷ выручка',null,T.drr,drrC(S,R)]];
+  const sbR=recs.filter(r=>r.chan==='Самовыкупы');
+  const sbW=sbR.filter(r=>r.plat==='Wildberries'), sbO=sbR.filter(r=>r.plat==='Ozon'), sbA=sbR.filter(r=>r.plat==='Авито');
+  const sbSum=a=>a.reduce((s,r)=>s+totOf(r.w)[1],0);
+  const sbwv=sbSum(sbW), sbov=sbSum(sbO), sbav=sbSum(sbA);
+  const sbCard=`<div class="kpi${st.kpi==='selfbuy'?' act':''}" onclick="setKpi('selfbuy')">
+    <div class="lbl">Самовыкупы${qm(T.sb)}</div>
+    <div class="val">${(sbwv||sbov||sbav)?fmt(sbwv+sbov+sbav):'—'}</div>
+    <div class="dlt">${(sbwv||sbov||sbav)?`WB ${fmt(sbwv)} · Ozon ${fmt(sbov)} · Авито ${fmt(sbav)}`:'в этом срезе нет'}</div></div>`;
+  const rw=rateLast('Wildberries'), ro=rateLast('Ozon'), ra=rateLast('Авито');
+  const rApi=META.ratingApi||null;
+  const rateCard=`<div class="kpi${st.kpi==='rate'?' act':''}" onclick="setKpi('rate')"><div class="lbl">Рейтинг карточек${qm(T.rate)}</div>
+    <div class="rt"><span>WB</span><b>${rw?rw.v.toFixed(1):'—'}</b><i>${rw?stars(rw.v):''}</i></div>
+    <div class="rt"><span>Ozon</span><b>${ro?ro.v.toFixed(1):'—'}</b><i>${ro?stars(ro.v):''}</i></div>
+    <div class="rt"><span>Авито</span><b>${ra?ra.v.toFixed(1):'—'}</b><i>${ra?stars(ra.v):''}</i></div>
+    <div class="dlt">${rw?('на '+rw.when):'нет данных'}${rApi?' · из API':''}</div></div>`;
+  const avR=recs.filter(r=>r.plat==='Авито'&&r.leads);
+  const avL=avR.reduce((a,r)=>a+r.leads.reduce((x,v)=>x+v,0),0), avM=avR.reduce((a,r)=>a+(r.msgs||0),0), avC=avR.reduce((a,r)=>a+(r.calls||0),0);
+  const avS=avR.reduce((a,r)=>a+totOf(r.w)[0],0);
+  const leadCard=`<div class="kpi${st.kpi==='leads'?' act':''}" onclick="setKpi('leads')"><div class="lbl">Контакты Авито${qm(T.leads)}</div>
+    <div class="val">${avL?fmt(avL):'—'}</div>
+    <div class="dlt">${avL?`сообщений ${fmt(avM)} · звонков ${fmt(avC)}${avS?` · ${rub(Math.round(avS/avL))} за контакт`:''}`:'в этом срезе нет'}</div></div>`;
+  const KKEY=['spend','orders','reg','osum','aov','buyouts','revenue','clicks','cpo','cpa','drr'];
+  if(!KKEY.includes(st.kpi)&&st.kpi!=='rate'&&st.kpi!=='selfbuy'&&st.kpi!=='leads') st.kpi='orders';
+  document.getElementById('kpis').innerHTML=rateCard+sbCard+leadCard
+   +cards.map((k,ix)=>
+   `<div class="kpi${st.kpi===KKEY[ix]?' act':''}" onclick="setKpi('${KKEY[ix]}')"><div class="lbl">${k[0]}${qm(k[4])}</div><div class="val ${k[5]||''}">${k[1]}</div><div class="dlt">${k[2]}</div>
+    ${k[3]!=null?`<div class="pbw"><div class="pb"><i style="width:${Math.min(k[3],100)}%;background:${k[3]>100?'#d97706':'#16a34a'}"></i></div><em>${k[3]}%</em></div>`:''}</div>`).join('');
+  document.getElementById('cut-h').textContent=isAll()?'Разрез года':'Разрез месяца';
+  // разрезы
+  const gp=groupBy(recs,r=>r.plat), gc=groupBy(recs,r=>r.chan),
+        gpr=groupBy(sel(true),r=>r.prod,k=>PRODS[k]||k),
+        gm=groupBy(recs,r=>r.mgr,k=>k==='—'?'Без менеджера (органика)':k);
+  splitTable('sp-plat',gp,'#2563eb',{rate:1}); drawChart('plat',gp);
+  splitTable('sp-chan',gc,'#16a34a'); drawChart('chan',gc);
+  splitTable('sp-prod',gpr,'#d97706'); drawChart('prod',gpr);
+  splitTable('sp-mgr',gm,'#7c3aed',{pend:1}); drawChart('mgr',gm);
+  const em=(id,g,word)=>{const t=totOf(aggW(g.filter(x=>!x.info)));
+    const bt=!t[1]&&t[7];
+    document.getElementById(id).textContent=`${g.length} ${word} · ${rub(t[0])} · ${fmt(bt?t[7]:t[1])} ${bt?'регистраций':'заказов'}`;};
+  em('em-plat',gp,'площадки'); em('em-chan',gc,'каналов'); em('em-prod',gpr,'продукта');
+  {const t=totOf(aggW(gm.filter(x=>!x.info))); let pn=0;
+   gm.forEach(r=>{const pd=pendOf(r.name); if(pd)pn+=pd[0];});
+   document.getElementById('em-mgr').textContent=`${gm.length} менеджера · ${fmt(t[5])} размещений вышло${pn?', '+fmt(pn)+' ждут выхода':''} · ${rub(t[0])}`;}
+  // качество
+  const paid=recs.filter(r=>r.tag!=='sys');
+  const by={art:0,promo:0,utm:0,mobz:0,none:0}; paid.forEach(r=>{if(by[r.tag]!=null)by[r.tag]+=totOf(r.w)[0]});
+  const tot=Object.values(by).reduce((a,b)=>a+b,0)||1;
+  const pc=k=>Math.round(by[k]/tot*100);
+  const nm=paid.filter(r=>r.tag==='none');
+  const nmS=nm.reduce((a,r)=>a+totOf(r.w)[0],0);
+  document.getElementById('qbar').innerHTML=
+   [['art','#16a34a','Артикул'],['promo','#7c3aed','Промокод'],['utm','#2563eb','UTM / Ozon-ссылка'],
+    ['mobz','#0891b2','Мобзио'],['none','#94a3b8','Без метки']]
+   .map(x=>pc(x[0])?`<div style="width:${pc(x[0])}%;background:${x[1]}">${x[2]} ${pc(x[0])}%</div>`:'').join('');
+  document.getElementById('q-sum').textContent=`${pc('none')}% бюджета без метки · ${nm.length} размещений на ${rub(nmS)}`;
+  const ch=META.check;
+  document.getElementById('alerts').innerHTML=(()=>{
+    const A=[];
+    if(nm.length) A.push(['bad',`${nm.length} размещений без рабочей метки — ${rub(nmS)}`,'Продажи по ним привязать нечем, в таблице помечены «оценка»']);
+    let pn=0,ps=0; Object.entries(META.pend||{}).forEach(([k,v])=>{if(isAll()||k.startsWith(st.m)){pn+=v[0];ps+=v[1];}});
+    if(pn) A.push(['warn',`Законтрактовано, но ещё не вышло: ${fmt(pn)} размещений на ${rub(ps)}`,'Статусы «Ожидаем выхода», «Перенос», «договор на подписании» в факт не идут']);
+    if(st.m==='2026-08'||isAll()) A.push(
+      ['','Август сведён по строкам',`Елена ${rub(META.check.el[0])} и ${fmt(META.check.el[1])} заказов, Мария ${rub(META.check.ma[0])} и ${fmt(META.check.ma[1])} — итоги таблиц совпадают со строками`],
+      ['','Итоги площадок — из выгрузок WB и Ozon',`За август WB ${fmt((META.fact['2026-08|Wildberries|atf']||[0])[0]+(META.fact['2026-08|Wildberries|appl']||[0])[0])} заказов, Ozon ${fmt((META.fact['2026-08|Ozon|atf']||[0])[0])}. Органика считается как остаток после рекламы, посевов и самовыкупов`]);
+    if(st.m==='2026-06'||st.m==='2026-07'||isAll()) A.push(
+      ['warn','Отчёты Ани: выкупы и выручка не заполнены','Есть только заказы и «сумма заказов» до выкупа, поэтому ДРР по июню и июлю не считается'],
+      ['','Данные Ани — это Wildberries','Ссылки ведут на wildberries.ru с UTM плюс редирект Мобзио, артикул аппликатора 1024637244 — карточка WB']);
+    A.push(['warn','Ozon: нет ключа Seller API','Органика и общее число заказов Ozon не считаются — виден только посев'],
+      ['warn','Сайт: выгрузка Тильды руками','Заказы и выкупы по меткам считаются, но CSV корзины загружается вручную'],
+      ['','Самовыкупы',`WB ${fmt(META.selfbuy.wb)}, Ozon ${fmt(META.selfbuy.oz)}. Сейчас ${st.sb==='on'?'учитываются в заказах':'вычтены из заказов'} — переключатель в шапке`],
+      ['','План по площадкам задан частично','У Елены WB и Ozon в медиаплане одной строкой «Маркетплейс»']);
+    return A.map(a=>`<div class="alert ${a[0]}"><span>${a[0]==='bad'?'🔴':a[0]==='warn'?'🟠':'⚪'}</span><div><b>${a[1]}</b>${a[2]}</div></div>`).join('');
+  })();
+  // виджеты
+  const leaves=recs.filter(r=>r.tag!=='sys'&&totOf(r.w)[0]>0)
+    .map(r=>({...r,t:totOf(r.w)}));
+  const nml=k=>k.link?`<a href="${k.link}" target="_blank" rel="noopener">${k.name}</a>`:k.name;
+  const li=(n,v,s,i)=>`<div class="li${i>=10?' more':''}"${i>=10?' style="display:none"':''}><span class="l"><span>${n}</span><small>${s}</small></span><span class="v">${v}</span></div>`;
+  const moreBtn=(id,cnt)=>cnt>10?`<button class="btn" style="margin-top:10px;width:100%" onclick="showMore('${id}',this)">Показать все ${cnt}</button>`:'';
+  const isB=k=>!k.t[1]&&(k.t[7]||0)>0;
+  const kOf=k=>isB(k)?k.t[7]:k.t[1];
+  const kCpo=k=>cpo(k.t[0],kOf(k));
+  const kLim=k=>isB(k)?250:limOf(k.prod)[1];
+  const scored=leaves.filter(k=>kOf(k)).sort((a,b)=>kCpo(a)-kCpo(b));
+  const inZone=scored.filter(k=>kCpo(k)<=kLim(k));
+  // если в пороге меньше 20 — добираем следующими по возрастанию, чтобы блок не пустовал
+  const bestL=inZone.length>=20?inZone:scored.slice(0,Math.min(20,scored.length));
+  const nOver=bestL.length-inZone.length;
+  const bLim=isBot()?250:limOf(st.prod)[1], bGood=isBot()?130:limOf(st.prod)[0];
+  document.getElementById('best').innerHTML=(bestL.map((k,i)=>li(nml(k),
+    `<span class="${isB(k)?cpaC(kCpo(k)):cpoC(kCpo(k),k.prod)}">${rub(kCpo(k))}</span>`,
+    `${k.scn?`<b class="scn">сцен. ${k.scn}</b> · `:''}${k.chan} · ${k.plat} · ${fmt(kOf(k))} ${isB(k)?'рег.':'зак.'}${isB(k)?'':` · ДРР ${k.t[3]?drr(k.t[0],k.t[3])+'%':'∞'}`}`,i)).join('')
+    +moreBtn('best',bestL.length))||`<p class="sub">нет размещений дешевле ${bLim} ₽</p>`;
+  document.getElementById('best-h').textContent=isBot()?'Лучшие по CPA':'Лучшие по CPO';
+  document.getElementById('best-qm').innerHTML=qm(T.best);
+  const unit=isBot()?'₽ за регистрацию':'₽ за заказ';
+  document.getElementById('best-sub').textContent=bestL.length
+    ? (nOver>0
+        ? `${inZone.length} в пороге до ${bLim} ${unit} · добрано ещё ${nOver} следующих по возрастанию`
+        : `${bestL.length} размещений дешевле ${bLim} ${unit} · зелёные до ${bGood} ₽`)
+    : 'нет размещений с заказами';
+  const bot=isBot();
+  const bad=k=>kOf(k)?kCpo(k):1e9;
+  const worstL=leaves.slice().sort((a,b)=>bad(b)-bad(a)).slice(0,20);
+  document.getElementById('worst-h').textContent=bot?'Слив бюджета — худшие по CPA':'Слив бюджета — худшие по CPO';
+  document.getElementById('worst-sub').textContent=bot
+    ? 'топ-20 по цене регистрации, ссылки на публикации'
+    : 'топ-20 по цене заказа, ссылки на публикации';
+  document.getElementById('worst').innerHTML=(worstL.map((k,i)=>li(nml(k),
+    kOf(k)?`<span class="bad">${rub(kCpo(k))}</span>`
+          :`<span class="bad">0 ${bot?'рег.':'зак.'}</span>`,
+    `${k.scn?`<b class="scn">сцен. ${k.scn}</b> · `:''}${k.chan} · ${k.plat} · ${rub(k.t[0])} · ${kOf(k)?fmt(kOf(k)):'0'} ${bot?'рег.':'зак.'}`,i)).join('')
+    +moreBtn('worst',worstL.length))||'<p class="sub">нет данных</p>';
+  document.getElementById('tblnote').textContent='Заказы и регистрации — разные метрики и не складываются: заказы у товаров, регистрации у ботов. CPA: зелёный до 130 ₽, жёлтый 130–250 ₽, красный выше 250 ₽ — пороги из целевой цены регистрации в медиаплане. CPO у AMINOTRIGGERFISH (Сигнал и Прикормка): зелёный до 200 ₽, жёлтый 200–400 ₽, красный выше 400 ₽; у аппликатора пороги выше из-за чека: зелёный до 800 ₽, жёлтый 801–2000 ₽, красный выше 2000 ₽. ДРР: зелёный до 20%, жёлтый 20–50%, красный выше 50%, ∞ — расход без выручки. План есть только там, где он задан в медиаплане: при выбранном фильтре по площадке, каналу или менеджеру план не показывается. Внутренняя реклама раскладывается по неделям из дневного расхода API.';
+  document.getElementById('footer').textContent='Источники: таблицы Елены и Марии, таблица подрядчика по Авито (временно), общий медиаплан, выгрузка заказов Тильды, API Wildberries и Ozon (заказы, выкупы, внутренняя реклама, внешний трафик по меткам, рейтинг). Из таблицы Анастасии берутся только самовыкупы.';
+  WKREG=isBot()||(!O&&REG>0);
+  renderPlanBlock();
+  renderTable(MODEL);
+  expandAll(0);
+  renderKpiChart();
+}
+// подсказки
+const tip=document.getElementById('tip');
+function showTipRaw(html,el){
+  tip.innerHTML=html; tip.classList.add('on');
+  const r=el.getBoundingClientRect(), w=Math.min(340,tip.offsetWidth||340);
+  let x=r.left+r.width/2-w/2, y=r.bottom+8;
+  x=Math.max(8,Math.min(x,innerWidth-w-8));
+  if(y+tip.offsetHeight>innerHeight-8) y=r.top-tip.offsetHeight-8;
+  tip.style.left=x+'px'; tip.style.top=Math.max(8,y)+'px';
+}
+function showTip(el){showTipRaw(el.dataset.t.replace(/&/g,'&amp;').replace(/</g,'&lt;'),el);}
+function chartTip(key,i,el){
+  const st2=CH[key], L=cols();
+  const MS=[METRICS.find(m=>m[0]===st2.ms[0])];
+  const rows=seriesOf(key).filter(r=>!st2.off.has(r.name));
+  const body=rows.map(r=>`<div style="display:flex;align-items:center;gap:6px;margin-top:3px">
+      <i style="width:8px;height:8px;border-radius:50%;background:${r.col};display:inline-block;flex:none"></i>
+      <span style="flex:1;opacity:.85">${r.name}</span>
+      <b>${MS.map(m=>mfmt(mval(r.w[i],m[0]),m[2])).join(' · ')}</b></div>`).join('');
+  showTipRaw(`<div style="font-weight:650;margin-bottom:2px">${L[i]} · ${MS.map(m=>m[1]).join(' · ')}</div>${body}`,el);
+}
+function hideTip(){tip.classList.remove('on')}
+document.addEventListener('mouseover',e=>{const q=e.target.closest('[data-t]'); if(q) showTip(q);});
+document.addEventListener('mouseout',e=>{if(e.target.closest('[data-t]')) hideTip();});
+document.addEventListener('click',e=>{const q=e.target.closest('.qm'); if(q){showTip(q); setTimeout(hideTip,6000);} else hideTip();});
+document.addEventListener('scroll',hideTip,true);
+
+function keepValid(){
+  const inM=RECORDS.filter(r=>(isAll()||r.m===st.m)&&typOK(r));
+  // продукт оставляем выбранным, если по нему есть хотя бы план — даже когда факта ещё нет
+  // (новый продукт до запуска: план показываем, факт пустой)
+  const typFits=p=>st.typ==='all'||(st.typ==='bots'?BOTP.has(p):!BOTP.has(p));
+  const planHas=p=>typFits(p)&&(isAll()?MLIST:[st.m]).some(m=>{
+    const P=META.plans&&META.plans[m]; return !!(P&&P.prod&&P.prod[p]);});
+  if(st.prod!=='all'&&!inM.some(r=>r.prod===st.prod)&&!planHas(st.prod)) st.prod='all';
+  const b0=inM.filter(r=>st.prod==='all'||r.prod===st.prod);
+  const actList=[...new Set(b0.map(r=>r.act))].concat(META.actmap?Object.values(META.actmap):[]);
+  if(st.act!=='all'&&!actList.includes(st.act)) st.act='all';
+  const b1=b0.filter(r=>st.act==='all'||r.act===st.act);
+  if(st.plat!=='all'&&!b1.some(r=>r.plat===st.plat)) st.plat='all';
+  const b2=b1.filter(r=>st.plat==='all'||r.plat===st.plat);
+  if(st.chan!=='all'&&!b2.some(r=>r.chan===st.chan)) st.chan='all';
+  const b3=b2.filter(r=>st.chan==='all'||r.chan===st.chan);
+  if(st.mgr!=='all'&&!b3.some(r=>r.mgr===st.mgr)) st.mgr='all';
+}
+document.getElementById('f-sb').addEventListener('change',e=>{st.sb=e.target.value;render();});
+document.getElementById('f-org').addEventListener('change',e=>{st.org=e.target.value;render();});
+['m','typ','prod','act','plat','chan','mgr'].forEach(k=>{
+  document.getElementById('f-'+k).addEventListener('change',e=>{
+    st[k]=e.target.value;
+    keepValid();
+    render();
+  });
+});
+function showMore(id,btn){
+  const box=document.getElementById(id), hid=[...box.querySelectorAll('.li.more')];
+  const shown=hid[0]&&hid[0].style.display!=='none';
+  hid.forEach(e=>e.style.display=shown?'none':'');
+  btn.textContent=shown?`Показать все ${hid.length+10}`:'Свернуть';
+}
+function resetF(){st.typ='all';st.act='all';st.plat='all';st.chan='all';st.mgr='all';st.prod='atf';st.sb='off';st.org='on';
+  document.getElementById('f-sb').value='off';document.getElementById('f-org').value='on';render();}
+render();
+// ================= ВКЛАДКА «АТРИБУЦИЯ» (тест) =================
+const AT={plat:'Ozon',prod:'atf',from:null,to:null,hl:null};
+const ATC={ads:'#94a3b8',utm:'#16a34a',org:'#dbe3ec',mod:'#d97706',rest:'#fcd9a6',tot:'#0f172a'};
+const ATMON={'2026-06':'Июнь','2026-07':'Июль','2026-08':'Август','2026-09':'Сентябрь','2026-10':'Октябрь'};
+function showTab(t){
+  document.getElementById('tab-main').hidden=t!=='main';
+  document.getElementById('tab-attr').hidden=t!=='attr';
+  document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+  if(t==='attr') atRender();
+  try{localStorage.setItem('dash-tab',t)}catch(e){}
+}
+function atSeries(){return (ATTR.series[AT.plat+'|'+AT.prod]||{days:[]}).days;}
+function atInitPeriod(){
+  const ds=atSeries().map(r=>r.d); if(!ds.length) return;
+  const ms=[...new Set(ds.map(d=>d.slice(0,7)))];
+  const sel=document.getElementById('at-m');
+  sel.innerHTML=`<option value="all">Весь период</option>`+ms.map(m=>`<option value="${m}">${ATMON[m]||m} 2026</option>`).join('')+`<option value="custom">Свои даты</option>`;
+  const last=ms[ms.length-1];
+  if(!AT.from||AT.from<ds[0]||AT.from>ds[ds.length-1]){AT.from=last+'-01'<ds[0]?ds[0]:last+'-01';AT.to=ds[ds.length-1];AT.mv=last;}
+  if(AT.to>ds[ds.length-1]) AT.to=ds[ds.length-1];
+  sel.value=AT.mv||'custom';
+  document.getElementById('at-from').value=AT.from; document.getElementById('at-to').value=AT.to;
+  document.getElementById('at-from').min=document.getElementById('at-to').min=ds[0];
+  document.getElementById('at-from').max=document.getElementById('at-to').max=ds[ds.length-1];
+}
+function atSetMonth(v){
+  const ds=atSeries().map(r=>r.d); AT.mv=v; if(v==='custom') return;
+  if(v==='all'){AT.from=ds[0];AT.to=ds[ds.length-1];}
+  else{const f=ds.filter(d=>d.startsWith(v)); AT.from=f[0]; AT.to=f[f.length-1];}
+  document.getElementById('at-from').value=AT.from; document.getElementById('at-to').value=AT.to; atRender();
+}
+function atParts(r){
+  const rem=r.total-r.ads-r.utm, org=Math.max(0,Math.min(r.base,rem)), mod=r.given,
+        rest=Math.max(0,rem-org-mod);
+  return {ads:r.ads,utm:r.utm,org,mod,rest};
+}
+function atPubs(){return ATTR.pubs.filter(p=>p.plat===AT.plat&&p.prod===AT.prod);}
+function atRender(){
+  // продукт «Аппликатор» есть только на WB
+  const pb=document.querySelector('#at-prod [data-v="appl"]'); pb.disabled=AT.plat==='Ozon';
+  if(AT.plat==='Ozon'&&AT.prod==='appl'){AT.prod='atf';}
+  document.querySelectorAll('#at-plat button').forEach(b=>b.classList.toggle('on',b.dataset.v===AT.plat));
+  document.querySelectorAll('#at-prod button').forEach(b=>b.classList.toggle('on',b.dataset.v===AT.prod));
+  atInitPeriod();
+  const rows=atSeries().filter(r=>r.d>=AT.from&&r.d<=AT.to);
+  const pubs=atPubs().filter(p=>p.day>=AT.from&&p.day<=AT.to);
+  // ---- плитки
+  const S={total:0,ads:0,utm:0,org:0,mod:0,rest:0};
+  rows.forEach(r=>{const p=atParts(r); S.total+=r.total; ['ads','utm','org','mod','rest'].forEach(k=>S[k]+=p[k]);});
+  const np=pubs.filter(p=>p.fact==null), sp=np.reduce((a,p)=>a+p.spend,0), mo=np.reduce((a,p)=>a+p.model,0);
+  const fp=pubs.filter(p=>p.fact!=null), fsp=fp.reduce((a,p)=>a+p.spend,0), fo=fp.reduce((a,p)=>a+p.fact,0);
+  const K=[['Заказов всего',S.total,ATC.tot,'Все заказы площадки за выбранные дни. Ozon — отчёт по заказам (отправления, FBS+FBO), WB — воронка продаж. Для WB до 07.09 — выгрузка кабинета по дням, с 08.09 — API.'],
+    ['Внутренняя реклама',S.ads,ATC.ads,'Заказы, которые площадка сама относит к своим рекламным кампаниям. Ozon — по дням из API рекламы. WB дневных заказов по рекламе не отдаёт: месячные заказы кампаний разложены по дням пропорционально дневному расходу (где расхода по дням нет — поровну).'],
+    ['UTM-факт',S.utm,ATC.utm,`Заказы по публикациям с UTM-меткой — только из отчёта Ozon «Внешний трафик» (API, отчёт от 21.09), модель к ним не применяется. Разложены от даты выхода: 60% в день выхода, 30% на следующий, 10% на третий. Таких публикаций: ${fp.length} (из них ${fp.filter(p=>p.nf).length} — метки нет в отчёте, факт 0; ${fp.filter(p=>p.shared).length} — с общей меткой), расход ${rub(fsp)}, CPO ${fo?rub(fsp/fo):'—'}.`],
+    ['Органический фон',S.org,'#b8c4d2','Сколько заказов площадка даёт «сама», без всплесков: 30-й перцентиль остатка (заказы − реклама − UTM) в окне ±10 дней. Всё, что выше фона, считается всплеском.'],
+    ['Отдано публикациям без меток',S.mod,ATC.mod,`Всплеск над фоном, разделённый между публикациями без факта, вышедшими в этот день или за 1–2 дня до него. Публикаций без факта: ${np.length}, расход ${rub(sp)}, CPO по модели ${mo?rub(sp/mo):'—'}.`],
+    ['Не распределено',S.rest,'#f5b971','Всплеск, который некому отдать: в эти дни не было публикаций без меток, или упёрлись в потолок 1% охвата. Это может быть недосчитанный UTM-факт, сарафан, акции площадки.']];
+  document.getElementById('at-kpis').innerHTML=K.map(k=>`<div class="at-k"><small><i style="background:${k[2]}"></i>${k[0]}${qm(k[3])}</small><b>${fmt(k[1])||0}</b></div>`).join('');
+  document.getElementById('at-leg').innerHTML=
+    [['Внутренняя реклама',ATC.ads],['UTM-факт',ATC.utm],['Органический фон',ATC.org],['Модель → публикациям',ATC.mod],['Не распределено',ATC.rest]]
+      .map(x=>`<span><i style="background:${x[1]}"></i>${x[0]}</span>`).join('')+
+    `<span><i class="dot" style="background:${ATC.utm}"></i>публикация с фактом</span><span><i class="dot" style="background:${ATC.mod}"></i>без метки</span><span><i class="dot" style="background:#cbd5e1"></i>без метки, модель 0</span><span>размер точки — расход</span>`;
+  atChart(rows,pubs);
+  atTable(pubs);
+  const P=ATTR.params;
+  document.getElementById('at-how').innerHTML=`
+  <p><b>Шаг 1. Заказы за день.</b> Ozon — отчёт по заказам, отправления FBS+FBO по дате заказа (аминотриггер, без аппликатора). WB — воронка продаж: до 07.09 из выгрузки кабинета по дням, с 08.09 из API. 21.09 по WB не включено — день не закончен.</p>
+  <p><b>Шаг 2. Минус внутренняя реклама.</b> Ozon — заказы кампаний по дням из API. WB — месячные заказы кампаний разложены по дням пропорционально дневному расходу (оценка: дневных заказов по рекламе WB не отдаёт).</p>
+  <p><b>Шаг 3. Минус UTM-факт.</b> У публикаций с UTM-меткой заказы берём только из отчёта Ozon, модель к ним не применяется. Метки нет в отчёте или по ней 0 заказов — факт 0 (статус «метки нет в отчёте»). Одна метка на нескольких публикациях — заказы делятся между ними, это видно в колонке «Общая метка». Раскладываем их от даты выхода: ${P.decay.map(x=>x*100+'%').join(' / ')} на день выхода и два следующих.</p>
+  <p><b>Шаг 4. Органический фон.</b> ${P.base_q*100}-й перцентиль остатка в окне ±${P.base_win} дней — сколько площадка даёт в «тихие» дни. Всплеск = остаток − фон; если остаток ниже фона, всплеск 0.</p>
+  <p><b>Шаг 5. Делим всплеск.</b> Между публикациями <b>без факта</b>, вышедшими в этот день или за 1–2 дня до него. Вес = охват × затухание (${P.decay.map(x=>x*100+'%').join('/')}) × конверсия охвата канала.
+  Конверсия канала взята из публикаций с UTM-фактом, заказов на 1000 охвата: ${Object.entries(P.conv).map(([k,v])=>k+' '+v).join(', ')}; для каналов без факта (TikTok, Rutube) — минимальная, ${P.low}.
+  Без этого поправочного коэффициента TikTok с сотнями тысяч просмотров забирал бы почти весь всплеск. Нет охвата — берём 10% подписчиков, нет и их — расход ÷ 10.</p>
+  <p><b>Потолок:</b> одна публикация не получает больше ${P.cap*100}% своего охвата. Остаток, который некому отдать, остаётся «не распределено».</p>
+  <p><b>Ограничения теста.</b> UTM-факт Ozon — из API, отчёт формируется утром, поэтому заказы по меткам за текущий день ещё не видны. Если в один день вышло несколько публикаций, модель делит всплеск по весам и не может сказать, кто именно «выстрелил». По WB меток нет совсем — вся атрибуция WB модельная. Цифры модели — <b>оценка</b>, не факт. Отчёт Ozon формируется утром, поэтому заказы по публикациям текущего дня появятся при следующем обновлении.</p>`;
+  document.getElementById('at-qm').innerHTML=qm('Тестовая вкладка. График — заказы площадки по дням, разложенные на слои: реклама, UTM-факт, органический фон, модель и нераспределённый остаток. Точки под графиком — публикации из таблиц менеджеров в день выхода. Ниже — список публикаций с расчётными заказами. Вкладку можно убрать целиком, основной дашборд она не меняет.');
+  document.getElementById('at-tqm').innerHTML=qm('Факт — заказы по UTM-метке из отчёта Ozon. По таблице — что внёс менеджер. Модель — оценка вкладки для публикаций без факта. Итог = факт, если он есть, иначе модель. CPO считается от итога.');
+}
+function atChart(rows,pubs){
+  const box=document.getElementById('at-chart');
+  if(!rows.length){box.innerHTML='<p class="sub">Нет данных за выбранный период</p>';return;}
+  AT.exp=AT.exp||new Set();
+  const n=rows.length, W=1000, pl=46, pr=12, pt=12, H1=260, ROW=11, BASE_ROWS=8;
+  const idx={}; rows.forEach((r,i)=>idx[r.d]=i);
+  // сколько точек в каждом дне и какую высоту занять
+  const per={}; pubs.forEach(p=>{if(idx[p.day]!=null)(per[p.day]=per[p.day]||[]).push(p)});
+  let need=BASE_ROWS; Object.entries(per).forEach(([d,a])=>{if(AT.exp.has(d)) need=Math.max(need,a.length);});
+  const band=need*ROW+14, H=H1+band+26;
+  const top0=Math.max(...rows.map(r=>{const p=atParts(r);return Math.max(r.total,p.ads+p.utm+p.org+p.mod+p.rest)}),1);
+  const raw=top0/4, mag=Math.pow(10,Math.floor(Math.log10(raw))), nice=[1,2,2.5,5,10].map(k=>k*mag).find(v=>v>=raw), top=nice*4;
+  const slot=(W-pl-pr)/n, X=i=>pl+slot*i, Y=v=>pt+(1-v/top)*(H1-pt-20);
+  const hp=AT.hl!=null?ATTR.pubs[AT.hl]:null, hlDay=hp&&idx[hp.day]!=null?hp.day:null;
+  let s=`<svg class="at" viewBox="0 0 ${W} ${H}">`;
+  if(hlDay!=null) s+=`<rect x="${X(idx[hlDay])}" y="${pt}" width="${slot}" height="${H-pt-4}" fill="#fde68a" fill-opacity=".45"/>`;
+  for(let g=0;g<=4;g++){const v=top*g/4,y=Y(v);s+=`<line class="grid" x1="${pl}" x2="${W-pr}" y1="${y}" y2="${y}"/><text class="axl" x="${pl-6}" y="${y+3}" text-anchor="end">${Math.round(v)}</text>`;}
+  rows.forEach((r,i)=>{
+    // вся колонка (область над столбцом) — сводка по дню
+    s+=`<rect x="${X(i)}" y="${pt}" width="${slot}" height="${H1-pt-20}" fill="transparent" onmouseenter="atDayTip(${i},this)" onmouseleave="hideTip()"/>`;
+    const p=atParts(r); let acc=0;
+    [['ads',ATC.ads],['utm',ATC.utm],['org',ATC.org],['mod',ATC.mod],['rest',ATC.rest]].forEach(([k,c])=>{
+      const v=p[k]; if(v<=0)return; const y0=Y(acc),y1=Y(acc+v); acc+=v;
+      s+=`<rect class="seg" x="${X(i)+slot*0.14}" y="${y1}" width="${slot*0.72}" height="${Math.max(0.5,y0-y1)}" fill="${c}" onmouseenter="atSegTip(${i},'${k}',this)" onmouseleave="hideTip()"/>`;});
+    const wk=new Date(r.d).getDay();
+    if(n<=45||i%2===0) s+=`<text class="axl" x="${X(i)+slot/2}" y="${H1-6}" text-anchor="middle" style="${wk===0||wk===6?'fill:#64748b;font-weight:600':''}">${n>20?r.d.slice(8,10):r.d.slice(8,10)+'.'+r.d.slice(5,7)}</text>`;
+  });
+  let d=''; rows.forEach((r,i)=>{d+=(i?'L':'M')+(X(i)+slot/2)+','+Y(r.total)+' ';});
+  s+=`<path d="${d}" fill="none" stroke="${ATC.tot}" stroke-width="1.6" stroke-dasharray="3 3" pointer-events="none"/>`;
+  const by0=H1+4; s+=`<line x1="${pl}" x2="${W-pr}" y1="${by0}" y2="${by0}" stroke="#e2e8f0"/><text class="axl" x="${pl-6}" y="${by0+14}" text-anchor="end">пуб.</text>`;
+  const mx=Math.max(...pubs.map(p=>p.spend),1);
+  Object.entries(per).forEach(([day,arr])=>{
+    const i=idx[day], open=AT.exp.has(day), cap=open?arr.length:BASE_ROWS;
+    arr.sort((a,b)=>b.spend-a.spend).forEach((p,k)=>{
+      if(k>=cap) return;
+      const id=ATTR.pubs.indexOf(p), sel=id===AT.hl;
+      const r=3+6*Math.sqrt(p.spend/mx), cy=by0+10+k*ROW;
+      const col=p.fact!=null?ATC.utm:(p.model>0.5?ATC.mod:'#cbd5e1');
+      s+=`<circle class="pub" cx="${X(i)+slot/2}" cy="${cy}" r="${Math.min(r,slot*0.45+2)}" fill="${col}" fill-opacity=".9"
+        stroke="${sel?'#0f172a':'#fff'}" stroke-width="${sel?2.5:1}" onmouseenter="atPubTip(${id},this)" onmouseleave="hideTip()" onclick="atHl(${id},true)"/>`;
+      if(sel) s+=`<circle cx="${X(i)+slot/2}" cy="${cy}" r="${Math.min(r,slot*0.45+2)+4}" fill="none" stroke="#0f172a" stroke-width="1.2" stroke-dasharray="2 2" pointer-events="none"/>`;
+    });
+    if(arr.length>BASE_ROWS){
+      const y=by0+10+(open?arr.length:BASE_ROWS)*ROW+2;
+      s+=`<text class="axl more" x="${X(i)+slot/2}" y="${y}" text-anchor="middle" style="cursor:pointer;fill:#2563eb;font-weight:600" onclick="atExp('${day}')">${open?'свернуть':'+'+(arr.length-BASE_ROWS)}</text>`;
+    }
+  });
+  box.innerHTML=s+'</svg>';
+  AT._rows=rows;
+}
+function atExp(day){AT.exp=AT.exp||new Set(); AT.exp.has(day)?AT.exp.delete(day):AT.exp.add(day);
+  atChart(AT._rows,atPubs().filter(p=>p.day>=AT.from&&p.day<=AT.to));}
+function atWin(r){return atPubs().filter(x=>{const lag=(new Date(r.d)-new Date(x.day))/864e5; return lag>=0&&lag<=2;});}
+const atN=v=>(Math.round(v*10)/10).toLocaleString('ru-RU');
+function atDayTip(i,el){
+  const r=AT._rows[i], p=atParts(r), win=atWin(r);
+  const line=(c,t,v)=>`<div style="display:flex;gap:6px;align-items:center;margin-top:2px"><i style="width:8px;height:8px;border-radius:2px;background:${c};display:inline-block"></i><span style="flex:1;opacity:.85">${t}</span><b>${atN(v)}</b></div>`;
+  let h=`<div style="font-weight:650">${r.d.split('-').reverse().join('.')} · ${AT.plat} · сводка дня</div>
+    ${line('#fff','Заказов всего',r.total)}${line(ATC.ads,'Внутренняя реклама',p.ads)}${line(ATC.utm,'UTM-факт',p.utm)}
+    ${line('#b8c4d2','Органический фон',p.org)}${line(ATC.mod,'Модель → публикациям',p.mod)}${line('#f5b971','Не распределено',p.rest)}`;
+  if(win.length) h+=`<div style="margin-top:6px;opacity:.7">Публикации в окне (день выхода и 2 дня до): ${win.length}</div>`;
+  h+=`<div style="margin-top:4px;opacity:.6">наведи на цвет столбца — подробно по слою</div>`;
+  showTipRaw(h,el);
+}
+function atSegTip(i,k,el){
+  const r=AT._rows[i], p=atParts(r), dd=r.d.split('-').reverse().join('.'), win=atWin(r);
+  const T={ads:['Внутренняя реклама',ATC.ads],utm:['UTM-факт',ATC.utm],org:['Органический фон','#b8c4d2'],mod:['Модель → публикациям без меток',ATC.mod],rest:['Не распределено','#f5b971']}[k];
+  let h=`<div style="font-weight:650"><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${T[1]};margin-right:6px"></i>${T[0]} · ${dd}</div><div style="margin-top:3px">Заказов: <b>${atN(p[k])}</b> из ${r.total}</div>`;
+  const list=a=>a.slice(0,10).map(x=>`<div style="margin-top:2px">${x[0]} <b style="float:right;margin-left:8px">${atN(x[1])}</b></div>`).join('')+(a.length>10?`<div style="opacity:.7">и ещё ${a.length-10}</div>`:'');
+  if(k==='ads') h+=`<div style="opacity:.75;margin-top:4px">${AT.plat==='Ozon'?'Заказы рекламных кампаний Ozon за этот день — из API рекламы.':'WB не отдаёт заказы рекламы по дням: месячные заказы кампаний разложены по дневному расходу (оценка).'}</div>`;
+  if(k==='utm'){const D=ATTR.params.decay;
+    const a=win.filter(x=>x.fact).map(x=>{const lag=Math.round((new Date(r.d)-new Date(x.day))/864e5);return [`${x.day.slice(8,10)}.${x.day.slice(5,7)} · ${x.name.slice(0,30)}`,x.fact*D[lag]];}).sort((a,b)=>b[1]-a[1]);
+    h+=`<div style="opacity:.75;margin-top:4px">Заказы публикаций с меткой: ${D.map(v=>v*100+'%').join('/')} от их факта в день выхода и два следующих.</div>`+list(a);}
+  if(k==='org') h+=`<div style="opacity:.75;margin-top:4px">Фон — сколько площадка даёт без всплесков: ${ATTR.params.base_q*100}-й перцентиль остатка за ±${ATTR.params.base_win} дней. Сегодня фон ${atN(r.base)}.</div>`;
+  if(k==='mod'){const a=win.filter(x=>x.byday&&x.byday[r.d]).map(x=>[`${x.day.slice(8,10)}.${x.day.slice(5,7)} · ${x.name.slice(0,30)}`,x.byday[r.d]]).sort((a,b)=>b[1]-a[1]);
+    h+=`<div style="opacity:.75;margin-top:4px">Всплеск над фоном, разделённый между публикациями без меток (охват × конверсия канала × затухание):</div>`+list(a);}
+  if(k==='rest') h+=`<div style="opacity:.75;margin-top:4px">Всплеск, который некому отдать: публикаций без меток в окне нет или они упёрлись в потолок 1% охвата. Может быть недосчитанный UTM-факт, сарафан, акции площадки.</div>`;
+  showTipRaw(h,el);
+}
+function atPubTip(id,el){
+  const p=ATTR.pubs[id];
+  showTipRaw(`<div style="font-weight:650">${p.name}</div>
+    <div style="opacity:.8">${p.day.split('-').reverse().join('.')} · ${p.chan} · ${p.mgr}</div>
+    <div style="margin-top:4px">Расход <b>${rub(p.spend)}</b> · охват <b>${fmt(p.reach)}</b></div>
+    <div>${p.fact!=null?`UTM-факт: <b>${p.fact}</b> зак.`:`Модель: <b>${p.model}</b> зак. · по таблице ${p.table??'—'}`}</div>
+    <div style="opacity:.7;margin-top:3px">клик — показать в списке</div>`,el);
+}
+// выделение: из графика → строка в таблице; из таблицы → точка и день на графике
+function atHl(id,fromChart){
+  AT.hl=(AT.hl===id&&!fromChart)?null:id;
+  const pubs=atPubs().filter(p=>p.day>=AT.from&&p.day<=AT.to);
+  const p=ATTR.pubs[id]; if(p){AT.exp=AT.exp||new Set(); AT.exp.add(p.day);}
+  atChart(AT._rows,pubs); atTable(pubs);
+  const t=fromChart?document.querySelector('#at-tbl tr.hl'):document.getElementById('at-chart');
+  if(t) t.scrollIntoView({block:'center',behavior:'smooth'});
+}
+const AT_COLS=[['day','Дата','s'],['name','Публикация','s'],['chan','Канал','s'],['mgr','Менеджер','s'],['spend','Расход','n'],['reach','Охват','n'],
+  ['fact','UTM-факт','n'],['table','По таблице','n'],['model','Модель','n'],['itog','Итог','n'],['cpo','CPO','n'],['st','Статус','n'],['sh','Общая метка','s']];
+function atVal(p,k){
+  const it=p.fact!=null?p.fact:p.model;
+  if(k==='itog') return it;
+  if(k==='cpo') return it>0.05?p.spend/it:Infinity;
+  if(k==='st') return p.fact!=null?(p.nf?1.5:2):(p.model>0.5?1:0);
+  if(k==='sh') return p.shared?(p.shared.key+'|'+String(p.shared.n).padStart(3,'0')):'';
+  if(k==='fact') return p.fact??-1;
+  if(k==='table') return p.table??-1;
+  if(k==='model') return p.fact==null?p.model:-1;
+  return p[k];
+}
+function atSort(k){const s=AT.sort||{};AT.sort={k,dir:s.k===k?-s.dir:(AT_COLS.find(c=>c[0]===k)[2]==='n'?-1:1)};
+  atTable(atPubs().filter(p=>p.day>=AT.from&&p.day<=AT.to));}
+function atTable(pubs){
+  const S=AT.sort||{k:'day',dir:1};
+  const rows=pubs.slice().sort((a,b)=>{let x=atVal(a,S.k),y=atVal(b,S.k);
+    if(typeof x==='string'){x=x.toLowerCase();y=(y||'').toLowerCase();}
+    return (x<y?-1:x>y?1:(b.spend-a.spend)*S.dir)*S.dir;});
+  let h='<thead><tr>'+AT_COLS.map(c=>`<th onclick="atSort('${c[0]}')" style="cursor:pointer;user-select:none" title="Сортировать">${c[1]}${S.k===c[0]?(S.dir>0?' ▲':' ▼'):'<span style="opacity:.3"> ↕</span>'}</th>`).join('')+'</tr></thead><tbody>';
+  let T=[0,0,0,0,0];
+  rows.forEach(p=>{
+    const id=ATTR.pubs.indexOf(p), it=p.fact!=null?p.fact:p.model, cpo=it>0.05?p.spend/it:0;
+    T[0]+=p.spend;T[1]+=p.fact||0;T[2]+=p.table||0;T[3]+=p.fact==null?p.model:0;T[4]+=it;
+    const b=p.nf?'<span class="bdg bz" title="Метка есть, но в отчёте Ozon по ней нет заказов (или метки нет в отчёте). Факт = 0, модель не применяется.">метки нет в отчёте</span>':p.fact!=null?'<span class="bdg bf">факт</span>':(p.model>0.5?'<span class="bdg bm">оценка</span>':'<span class="bdg bz">нет всплеска</span>');
+    h+=`<tr class="${AT.hl===id?'hl':''}" style="cursor:pointer" onclick="if(event.target.tagName!=='A')atHl(${id},false)" title="Показать на графике"><td>${p.day.slice(8,10)}.${p.day.slice(5,7)}</td>
+      <td class="nm">${p.link?`<a href="${p.link}" target="_blank" rel="noopener">${p.name}</a>`:p.name}</td><td>${p.chan}</td><td>${p.mgr}</td>
+      <td>${rub(p.spend)}</td><td>${fmt(p.reach)}</td><td>${p.fact!=null?atN(p.fact):'—'}</td><td>${p.table!=null?atN(p.table):'—'}</td>
+      <td>${p.fact==null?atN(p.model):'—'}</td><td><b>${atN(it)}</b></td>
+      <td class="${cpo?cpoC(cpo,AT.prod):''}">${cpo?rub(cpo):'—'}</td><td>${b}</td>
+      <td>${p.shared?`<span class="bdg bsh" title="Одна метка на ${p.shared.n} публикациях без различающего хвоста. Заказы по ней (${p.shared.o}) из отчёта Ozon поделены между ними — кому какой заказ, по отчёту не различить.">${p.shared.key} ×${p.shared.n}</span>`:''}</td></tr>`;
+  });
+  h+=`<tr style="font-weight:650"><td></td><td>Итого: ${rows.length} публ.</td><td></td><td></td><td>${rub(T[0])}</td><td></td><td>${fmt(T[1])}</td><td>${fmt(T[2])}</td><td>${fmt(T[3])}</td><td>${fmt(T[4])}</td><td>${T[4]?rub(T[0]/T[4]):'—'}</td><td></td><td></td></tr>`;
+  document.getElementById('at-tbl').innerHTML=h+'</tbody>';
+}
+document.addEventListener('DOMContentLoaded',()=>{});
+(function(){
+  document.querySelectorAll('#at-plat button').forEach(b=>b.onclick=()=>{AT.plat=b.dataset.v;AT.hl=null;AT.exp=new Set();atRender();});
+  document.querySelectorAll('#at-prod button').forEach(b=>b.onclick=()=>{if(b.disabled)return;AT.prod=b.dataset.v;AT.hl=null;atRender();});
+  document.getElementById('at-m').onchange=e=>atSetMonth(e.target.value);
+  document.getElementById('at-from').onchange=e=>{AT.from=e.target.value;AT.mv='custom';atRender();};
+  document.getElementById('at-to').onchange=e=>{AT.to=e.target.value;AT.mv='custom';atRender();};
+  let t='main'; try{t=localStorage.getItem('dash-tab')||'main'}catch(e){}
+  if(t==='attr') showTab('attr');
+})();
+
+</script>
+</body>
+</html>

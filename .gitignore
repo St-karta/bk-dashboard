@@ -1,0 +1,14 @@
+src/
+raw/
+logs/
+api.prev/
+.private/
+*.xlsx
+*.xlsm
+*.csv
+__pycache__/
+engine/records.json
+engine/frozen.json
+engine/etalon_sep.json
+engine/api/
+engine/LOGIC.md
